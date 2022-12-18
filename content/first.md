@@ -5,3 +5,5 @@ draft: false
 ---
 
 填写某些内容，触发部署。
+
+Github pages 必须要使用公开仓库才可以。
