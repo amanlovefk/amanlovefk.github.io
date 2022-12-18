@@ -1,2 +1,18 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>白夜的博客</title><link>https://baiyeqm.github.io/</link><description>Recent content on 白夜的博客</description><generator>Hugo -- gohugo.io</generator><language>zh-Hans</language><lastBuildDate>Sun, 18 Dec 2022 12:33:58 +0800</lastBuildDate><atom:link href="https://baiyeqm.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>About</title><link>https://baiyeqm.github.io/about/</link><pubDate>Sun, 18 Dec 2022 17:27:03 +0800</pubDate><guid>https://baiyeqm.github.io/about/</guid><description>关于</description></item><item><title>third</title><link>https://baiyeqm.github.io/2022/12/18/third/</link><pubDate>Sun, 18 Dec 2022 12:33:58 +0800</pubDate><guid>https://baiyeqm.github.io/2022/12/18/third/</guid><description/></item><item><title>first</title><link>https://baiyeqm.github.io/2022/12/18/first/</link><pubDate>Sun, 18 Dec 2022 12:28:20 +0800</pubDate><guid>https://baiyeqm.github.io/2022/12/18/first/</guid><description>填写某些内容，触发部署。
-Github pages 必须要使用公开仓库才可以。</description></item><item><title>second</title><link>https://baiyeqm.github.io/2022/12/18/second/</link><pubDate>Sun, 18 Dec 2022 12:28:20 +0800</pubDate><guid>https://baiyeqm.github.io/2022/12/18/second/</guid><description>Hugo 有时候会有点问题，看不见 post.</description></item></channel></rss>
+Github pages 必须要使用公开仓库才可以。
+目前的可行的道路：
+读研 跳槽 变瘦 海量的阅读 提升肺活量 提升语言的丰富度 提升衣品 我现在在做什么？现在是2022年的12月，疫情开放期。多年以后，也许当我回顾那个感染高发的冬季，依然能够想起那种在压抑的环境下被困住的那种左右为难、无可排遣的感受。
+这个周末我重新注册了 Github 账号，把 Hugo 的主题列表来来回回翻了好几遍，试了五六个，最后还是选了之前从某个博客上看到的这个比较简洁又不失美感的主题。搭好了 Github Pages Action 之后，我打算直接在 Github 自带的富文本编辑器上输出，形式对于我来说已经没有意义，回归纯文本。
+当然这个周末我还干了另外一件失败的事情 ———— 在我的 Ubuntu 虚拟机中安装 K8S。一开始，我打算使用三台虚拟机，一主二从，后来因为磁盘不够，妥协到一主一从。在配置的过程中因为 kubenet 一直启动失败准备放弃，后面实在不甘心，了解到 minikube 可以快速搭建单节点的 K8S，然而，还是 kubenet 的问题，一直失败，搞得我异常烦躁。
+我正事（上面列出的道理）一个都没干，在一个边缘的无用的东西上死磕，这也算是拖延症了吧。
+在极度封闭的环境下，我和外界隔绝，而网络的刺激逐渐对我失效。睡梦里，静坐着，发呆着，我思考关于我的行为动机的根源。上面列出的任何一项，但凡坚持下去都很好。可是，我行动缓慢，我很痛苦。也许这是因为我被训练得像一条狗，要马上得到回应，否则就焦躁不安。
+现在是晚上的 21:51 分，明天仍然要在危险中去公司上班。有时候，在工作日的间隙处，我感到无力，我竟然还在这里为了基本的生存浪费我的生命。中午到了，下班了，我难以行动，对于食物，对于闲暇，我太熟悉了，以至于失去鲜明的记忆。我被困在这里了，动弹不得。
+这种困顿并不陌生，然而思考并不能直接帮助我脱离困境。
+行动。具体的行动。每天都要行动。卓有成效的行动。
+读研篇 先把高数搞清楚。
+跳槽篇 先搞清楚需要准备哪些内容，然后逐个击破。
+LeetCode 刷题不能停。
+变瘦篇 提升精气神，从每天坚持居家锻炼10分钟开始。
+我的目标是瘦到120斤。
+阅读篇 该读什么？从实际出发，先从容易读的开始。那种大部头的就先放放吧，即使它们已经站在书架中看了我很久。现在就决定！要选那种与我当前境况应景的阅读。
+明天晚上我要做什么？列出来。从最难的开始吧，即锻炼，然后是高数。</description></item><item><title>second</title><link>https://baiyeqm.github.io/2022/12/18/second/</link><pubDate>Sun, 18 Dec 2022 12:28:20 +0800</pubDate><guid>https://baiyeqm.github.io/2022/12/18/second/</guid><description>Hugo 有时候会有点问题，看不见 post.</description></item></channel></rss>
