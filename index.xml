@@ -2,5 +2,6 @@
 填写某些内容，触发部署。
 Github pages 必须要使用公开仓库才可以。</description></item><item><title>first</title><link>https://amanlovefk.github.io/posts/first/</link><pubDate>Sun, 18 Dec 2022 12:28:20 +0800</pubDate><guid>https://amanlovefk.github.io/posts/first/</guid><description>
 填写某些内容，触发部署。
-Github pages 必须要使用公开仓库才可以。</description></item><item><title>Second</title><link>https://amanlovefk.github.io/posts/second/</link><pubDate>Sun, 18 Dec 2022 12:28:20 +0800</pubDate><guid>https://amanlovefk.github.io/posts/second/</guid><description>
+Github pages 必须要使用公开仓库才可以。
+似乎 必须写在这个目录下才能发布</description></item><item><title>Second</title><link>https://amanlovefk.github.io/posts/second/</link><pubDate>Sun, 18 Dec 2022 12:28:20 +0800</pubDate><guid>https://amanlovefk.github.io/posts/second/</guid><description>
 Hugo 有时候会有点问题，看不见 post.</description></item></channel></rss>
