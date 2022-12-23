@@ -33,7 +33,7 @@
 <link rel=stylesheet href=/css/main.min.08ebc9a6fe9879a55c7c23d5568de256dafee7bfce20e8b9f0143807c4cb99e5.css>
 <style type=text/css>.post-footer,.flinks-list-footer hr:after{content:"~ 我可是有底线的哟 ~"}</style>
 <script type=text/javascript>(function(){localDB={set:function(b,c,a){if(a===0)return;const d=new Date,e=a*864e5,f={value:c,expiry:d.getTime()+e};localStorage.setItem(b,JSON.stringify(f))},get:function(a){const b=localStorage.getItem(a);if(!b)return void 0;const c=JSON.parse(b),d=new Date;return d.getTime()>c.expiry?(localStorage.removeItem(a),void 0):c.value}},theme={active:function(){const a=localDB.get('theme');if(a==void 0)return;theme.toggle(a),window.matchMedia("(prefers-color-scheme: dark)").addListener(function(a){theme.toggle(a.matches?'dark':'light')})},toggle:function(a){document.documentElement.setAttribute('data-theme',a),localDB.set('theme',a,2);const b=document.querySelector('iframe.giscus-frame');if(b){const c={setConfig:{theme:a}};b.contentWindow.postMessage({giscus:c},'https://giscus.app')}}},theme.active()})(window)</script>
-<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"path":"seventh","permalink":"/post/seventh/","title":"Paxos Simple 阅读笔记","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
+<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"math":{"js":{"file":"es5/tex-mml-chtml.js","name":"mathjax","version":"3.2.0"},"render":"mathjax"},"path":"seventh","permalink":"/post/seventh/","title":"Paxos Simple 阅读笔记","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
 <script type=text/javascript>document.addEventListener('DOMContentLoaded',()=>{var a=document.createElement('script');a.charset="UTF-8",a.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js",a.async=!1,a.defer=!0,document.head.appendChild(a),a.onload=function(){NexT.utils.fmtBusuanzi()}})</script>
 <title>Paxos Simple 阅读笔记 - Hugo NexT</title>
 <noscript>
@@ -231,11 +231,11 @@
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-font"></i>总字数：</div>
-<div class=item-count id=wordsCount data-count=3047></div>
+<div class=item-count id=wordsCount data-count=4361></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-mug-hot"></i>阅读约：</div>
-<div class=item-count id=readTimes data-times=10></div>
+<div class=item-count id=readTimes data-times=12></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-clock-rotate-left"></i>最后更新于：</div>
@@ -301,14 +301,14 @@
 <span class=post-meta-item-icon>
 <i class="far fa-file-word"></i>
 </span>
-<span class=post-meta-item-text>字数：</span><span>1012</span>
+<span class=post-meta-item-text>字数：</span><span>2326</span>
 </span>
 <span class=post-meta-item title=阅读>
 <span class=post-meta-item-icon>
 <i class="far fa-clock"></i>
 </span>
 <span class=post-meta-item-text>阅读：&ap;</span>
-<span>3分钟</span>
+<span>5分钟</span>
 </span>
 <span class=post-meta-item title=浏览>
 <span class=post-meta-item-icon>
@@ -365,6 +365,43 @@
 </ul>
 <p>集合 {S1, S2, S3} 和 {S2, S4, S5} 之间存在交集 {S2}。如果要达成共识，即 <code>v1 = v2</code> 的话，S2 只能选择一个值。</p>
 <p>因为 S1, S3 和 S2 选择相同， S4, S5 和 S2 选择相同，所以 Acceptor 之间达成了共识。</p>
+<p>假如没有失败和消息丢失，在一个 Proposer 的情况下，并且该 Proposer 只提出了一个提案，那么这个提案应该被接受并选中。这意味着满足下面的要求：</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2><code class=language-fallback data-lang=fallback>P1. 一个 Acceptor 必须接受它收到的第一个提案
+</code></pre></div><p>但是这个要求会导致一个问题。假设几个proposer各自提案了不同的值，导致每个acceptor都接受了一个值，但是没有一个值被大多数acceptor所接受。</p>
+<p>P1 和 一个值被选中当且仅当被多数acceptor接受要求 acceptor 必须能够接受多个提案。这个结论看着很简单，却不是那么自然地容易得出。为什么
+acceptor 只接受一个提案就不能形成共识呢？前面提到，形成共识的前提是两个多数的交集接受了同一个值。</p>
+<blockquote>
+<p>假设我们共有 5 个Acceptor，分别为 S1, S2, S3, S4, S5. 其中：</p>
+<ul>
+<li>S1, S2, S3 选中了值 v1</li>
+<li>S2, S4, S5 选中了值 v2</li>
+</ul>
+</blockquote>
+<p>加入 S2 先接受了 v1, 那么 S1, S2, S3 接受了 v1, S4 和 S5 接受了 v2，v1 被多数接受，这不是形成了共识了吗？但如果 S2 挂掉，剩下的 S1, S3
+与 S4, S5 分别接收了 v1 和 v2, 此时又形成了分裂。这种情况下不能形成共识。</p>
+<p>我们已经通过例子证明了接受单个提案容易导致单点故障，那么不妨让acceptor能够接收多个提案。</p>
+<p>“多个提案”，acceptor 如何知道收到的两条消息是不同的提案呢？我们给提案附加一个编号，这样的话提案就由两个部分组成：</p>
+<ul>
+<li>提案编号</li>
+<li>提案的值</li>
+</ul>
+<p>为了避免混淆，我们要求不同的提案必须有不同的编号。这里的不同是指不同的消息。提案的内涵得到了扩容，值被选中的条件也需要稍作调整。</p>
+<p><strong>一个值被选中当且仅当一个拥有该值的提案被大多数acceptor所接受。</strong></p>
+<p>在这种情况下，我们说提案（包含它的值）被选中。</p>
+<p>我们允许多个提案被选中，但是保证所有被选中的提案都有相同的值。编号肯定有大小，现在保证对于某个proposer而言，后发出的提案的编号更大。
+如果多个提案被选中，那么后面的提案编号更大，但是值确实和被选中的值相同。即满足：</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2><code class=language-fallback data-lang=fallback>P2. 如果一个值为 v 的提案被选中，那么每个更高编号的被选中的提案的值也是 v
+</code></pre></div><p>为什么要限制“更大的编号”呢？“如果一个值为 v 的提案被选中，那么后面被选中的提案的值也是 v”，这样说行不行呢？这是一个疑问。</p>
+<p>为了被选中，一个提案至少要被一个acceptor所接受。所以，为了满足 P2，我们必须满足：</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2><code class=language-html data-lang=html>P2^a 如果一个值为v的提案被选中之后，那么更大编号的由acceptor接收的提案的值也为 v.
+</code></pre></div><p>有了 P2^a，我们仍然要满足 P1。假设一个提案被一个从未接受过任何提案的acceptor c 所接受。这时候一个新的 proposer 醒来了，发出了一个更大的
+但是不同值的提案。P1 要求 c 接受这个提案，此时已经有多数接受了某个值，即已经有值被选中了，这样就违反了 P2^a。</p>
+<p>为了同时满足 P1 和 P2^a，要求我们加强 P2^a 到 P2^b</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:2;-o-tab-size:2;tab-size:2><code class=language-html data-lang=html>P2^b 如果一个值为v的值已经被选中，那么任何更大的编号由proposer发出的提案的值都是v
+</code></pre></div><p>因为一个提案是先由 proposer 发出，然后由 acceptor 接收，所以由 P2^b 可以满足 P2^a，间接满足 P2.</p>
+<p>为了探索如何满足 P2^b，让我们考虑如何证明它成立。假设已经有编号为 m, 值为 v 的提案被选中，那么任何编号大于 m 的编号 n 的提案的值都是 v.</p>
+<p>我们在 n 上面使用数据归纳法，我们可以证明在假设编号在 m..(n-1) 之间的提案都有值 v 的前提下证明满足 P2^b.</p>
+<p>当编号为 m 的编号的提案被选中时，肯定有一个包含多数的集合 C，其中的 acceptor 都接受了它。</p>
 </div>
 <footer class=post-footer>
 <div class=addthis_inline_share_toolbox style=text-align:center></div>
@@ -482,5 +519,6 @@ Webify
 <script type=text/javascript src=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.js defer></script>
 <script class=next-config data-name=main type=application/json>{"bookmark":{"color":"#222","enable":true,"save":"manual"},"busuanzi":{"pageview":true},"copybtn":true,"darkmode":true,"giscus":{"cfg":{"category":"Comments","categoryid":null,"emit":false,"inputposition":"top","mapping":"title","reactions":false,"repo":"username/repo-name","repoid":null,"theme":"preferred_color_scheme"},"js":"https://giscus.app/client.js"},"hostname":"/","i18n":{"ds_day":" 天前","ds_days":" 天 ","ds_hour":" 小时前","ds_hours":" 小时 ","ds_just":"刚刚","ds_min":" 分钟前","ds_mins":" 分钟","ds_month":" 个月前","ds_years":" 年 ","empty":"没有找到任何搜索结果：${query}","hits":"","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","placeholder":"搜索..."},"lang":"zh-CN","lazyload":false,"localSearch":{"enable":true,"path":"/searchindexes.xml","preload":false,"topnperarticle":-1,"trigger":"auto","unescape":false},"motion":{"async":true,"enable":true,"transition":{"collheader":"fadeInLeft","postblock":"fadeIn","postbody":"fadeInDown","postheader":"fadeInDown","sidebar":"fadeInUp"}},"root":"/","scheme":"Gemini","sidebar":{"display":"post","offset":12,"padding":18,"position":"left","width":256},"statis":{"enable":true,"plugin":"busuanzi"},"vendor":{"plugins":"qiniu","router":"https://cdn.staticfile.org"},"version":"4.4.1","waline":{"cfg":{"comment":true,"emoji":false,"imguploader":false,"pageview":true,"placeholder":"请文明发言哟 ヾ(≧▽≦*)o","reaction":true,"reactiontext":["点赞","踩一下","得意","不屑","尴尬","睡觉"],"reactiontitle":"你认为这篇文章怎么样？","requiredmeta":["nick","mail"],"serverurl":null,"sofa":"快来发表你的意见吧 (≧∀≦)ゞ","wordlimit":200},"css":{"alias":"waline","file":"dist/waline.css","name":"@waline/client","version":"2.13.0"},"js":{"alias":"waline","file":"dist/waline.js","name":"@waline/client","version":"2.13.0"}}}</script>
 <script type=text/javascript src=/js/main.min.44e149fb005d323e897bd72afd72683c11a203d5aa2948965bee4289c491dab5.js defer></script>
+<script type=text/javascript src=/js/math.min.1fb33fda8b305eaca1f35ca9c4a2d48720faef3709052f4a0a8d750928b37b5b.js defer></script>
 </body>
 </html>
