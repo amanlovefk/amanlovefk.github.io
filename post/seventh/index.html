@@ -8,34 +8,34 @@
 <link rel=icon type=image/png sizes=16x16 href=/imgs/icons/favicon_16x16_next.png>
 <link rel=icon type=image/png sizes=32x32 href=/imgs/icons/favicon_32_32_next.png>
 <link rel=apple-touch-icon sizes=180x180 href=/imgs/icons/apple_touch_icon_next.png>
-<meta itemprop=name content="About">
+<meta itemprop=name content="Paxos Simple 阅读笔记">
 <meta itemprop=description content="保持简单的易用性和强大的功能。">
 <meta itemprop=datePublished zgotmplz>
 <meta itemprop=dateModified zgotmplz>
 <meta itemprop=image content="/imgs/hugo_next_avatar.png">
 <meta itemprop=keywords content="Hugo,NexT,主题,简单,强大">
 <meta property="og:type" content="article">
-<meta property="og:title" content="About">
+<meta property="og:title" content="Paxos Simple 阅读笔记">
 <meta property="og:description" content="保持简单的易用性和强大的功能。">
 <meta property="og:image" content="/imgs/hugo_next_avatar.png">
 <meta property="og:image:width" content="312">
 <meta property="og:image:height" content="312">
 <meta property="og:image:type" content="image/jpeg/png/svg/jpg">
-<meta property="og:url" content="/about/">
+<meta property="og:url" content="/post/seventh/">
 <meta property="og:site_name" content="Hugo NexT">
 <meta property="og:locale" content="zh-CN">
 <meta property="article:author" content="NexT 主题">
-<meta property="article:published_time" content="2022-12-18 17:27:03 +0800 +0800">
-<meta property="article:modified_time" content="2022-12-18 17:27:03 +0800 +0800">
+<meta property="article:published_time" content="2022-12-23 19:37:07 +0800 +0800">
+<meta property="article:modified_time" content="2022-12-23 19:37:07 +0800 +0800">
 <link type=text/css rel=stylesheet href=https://cdn.staticfile.org/font-awesome/6.1.2/css/all.min.css>
 <link type=text/css rel=stylesheet href=https://cdn.staticfile.org/animate.css/3.1.1/animate.min.css>
 <link type=text/css rel=stylesheet href=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.css>
 <link rel=stylesheet href=/css/main.min.08ebc9a6fe9879a55c7c23d5568de256dafee7bfce20e8b9f0143807c4cb99e5.css>
 <style type=text/css>.post-footer,.flinks-list-footer hr:after{content:"~ 我可是有底线的哟 ~"}</style>
 <script type=text/javascript>(function(){localDB={set:function(b,c,a){if(a===0)return;const d=new Date,e=a*864e5,f={value:c,expiry:d.getTime()+e};localStorage.setItem(b,JSON.stringify(f))},get:function(a){const b=localStorage.getItem(a);if(!b)return void 0;const c=JSON.parse(b),d=new Date;return d.getTime()>c.expiry?(localStorage.removeItem(a),void 0):c.value}},theme={active:function(){const a=localDB.get('theme');if(a==void 0)return;theme.toggle(a),window.matchMedia("(prefers-color-scheme: dark)").addListener(function(a){theme.toggle(a.matches?'dark':'light')})},toggle:function(a){document.documentElement.setAttribute('data-theme',a),localDB.set('theme',a,2);const b=document.querySelector('iframe.giscus-frame');if(b){const c={setConfig:{theme:a}};b.contentWindow.postMessage({giscus:c},'https://giscus.app')}}},theme.active()})(window)</script>
-<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"path":"about","permalink":"/about/","title":"About","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
+<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"path":"seventh","permalink":"/post/seventh/","title":"Paxos Simple 阅读笔记","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
 <script type=text/javascript>document.addEventListener('DOMContentLoaded',()=>{var a=document.createElement('script');a.charset="UTF-8",a.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js",a.async=!1,a.defer=!0,document.head.appendChild(a),a.onload=function(){NexT.utils.fmtBusuanzi()}})</script>
-<title>About - Hugo NexT</title>
+<title>Paxos Simple 阅读笔记 - Hugo NexT</title>
 <noscript>
 <link rel=stylesheet href=/css/noscript.css>
 </noscript>
@@ -74,7 +74,7 @@
 </a>
 </li>
 <li class="menu-item menu-item-about">
-<a href=/about/ class="hvr-icon-pulse menu-item-active" rel=section><i class="fa fa-user hvr-icon"></i>关于
+<a href=/about/ class=hvr-icon-pulse rel=section><i class="fa fa-user hvr-icon"></i>关于
 </a>
 </li>
 <li class="menu-item menu-item-flinks">
@@ -134,7 +134,17 @@
 </ul>
 <div class=sidebar-panel-container>
 <div class="post-toc-wrap sidebar-panel">
-<div class="post-toc animated"><nav id=TableOfContents></nav></div>
+<div class="post-toc animated"><nav id=TableOfContents>
+<ul>
+<li><a href=#问题定义>问题定义</a></li>
+<li><a href=#如何选择一个值>如何选择一个值</a>
+<ul>
+<li><a href=#单个-acceptor>单个 Acceptor</a></li>
+<li><a href=#多个-acceptor>多个 Acceptor</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
 </div>
 <div class="site-overview-wrap sidebar-panel">
 <div class="site-author site-overview-item animated" itemprop=author itemscope itemtype=http://schema.org/Person>
@@ -260,7 +270,7 @@
 <div class="main-inner post posts-expand">
 <div class=post-block>
 <article itemscope itemtype=http://schema.org/Article class=post-content lang>
-<link itemprop=mainEntityOfPage href=/about/>
+<link itemprop=mainEntityOfPage href=/post/seventh/>
 <span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
 <meta itemprop=image content="/imgs/hugo_next_avatar.png">
 <meta itemprop=name content="NexT 主题">
@@ -270,12 +280,12 @@
 <meta itemprop=description content="保持简单的易用性和强大的功能。">
 </span>
 <span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
-<meta itemprop=name content="About">
-<meta itemprop=description content="关于">
+<meta itemprop=name content="Paxos Simple 阅读笔记">
+<meta itemprop=description content="问题定义 什么是共识算法（Consensus Algorithm）： 一个集合中的每个进程都能对某个变量的值作出提案。共识算法保证在提案（prop">
 </span>
 <header class=post-header>
-<h1 class=post-title itemprop="name headline">About
-<a href=https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name/about.md rel="noopener external nofollow noreferrer" target=_blank class="exturl post-edit-link" title=编辑><i class="fa fa-pen-nib"></i></a> </h1>
+<h1 class=post-title itemprop="name headline">Paxos Simple 阅读笔记
+<a href=https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name/post/seventh.md rel="noopener external nofollow noreferrer" target=_blank class="exturl post-edit-link" title=编辑><i class="fa fa-pen-nib"></i></a> </h1>
 <div class=post-meta-container>
 <div class=post-meta-items>
 <span class=post-meta-item>
@@ -283,7 +293,7 @@
 <i class="far fa-calendar"></i>
 </span>
 <span class=post-meta-item-text>发表于：</span>
-<time title="发表于：2022-12-18 17:27:03 +0800 +0800" itemprop="dateCreated datePublished" datetime="2022-12-18 17:27:03 +0800 +0800">2022-12-18</time>
+<time title="发表于：2022-12-23 19:37:07 +0800 +0800" itemprop="dateCreated datePublished" datetime="2022-12-23 19:37:07 +0800 +0800">2022-12-23</time>
 </span>
 </div>
 <div class=post-meta-items>
@@ -291,14 +301,14 @@
 <span class=post-meta-item-icon>
 <i class="far fa-file-word"></i>
 </span>
-<span class=post-meta-item-text>字数：</span><span>2</span>
+<span class=post-meta-item-text>字数：</span><span>1012</span>
 </span>
 <span class=post-meta-item title=阅读>
 <span class=post-meta-item-icon>
 <i class="far fa-clock"></i>
 </span>
 <span class=post-meta-item-text>阅读：&ap;</span>
-<span>1分钟</span>
+<span>3分钟</span>
 </span>
 <span class=post-meta-item title=浏览>
 <span class=post-meta-item-icon>
@@ -307,7 +317,7 @@
 <span class=post-meta-item-text>
 浏览：
 </span>
-<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/about/>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/seventh/>
 <i class="fa fa-sync fa-spin"></i>
 </span>
 </span>
@@ -315,7 +325,46 @@
 </div>
 </header>
 <div class="post-body autonumber" itemprop=articleBody>
-<p>关于</p>
+<h2 id=问题定义>问题定义</h2>
+<p>什么是共识算法（Consensus Algorithm）：</p>
+<p>一个集合中的每个进程都能对某个变量的值作出提案。共识算法保证在提案（proposed）的值中只有一个被选中（chosen）。如果没有值被提出，那么就没有
+值被选中。如果已经有值被选中了，那么进程能够学习（learn）到这个选中的值。</p>
+<p>共识算法的活性要求（safety requirements）：</p>
+<ul>
+<li>在提案的值中只有一个能被选中</li>
+<li>仅选择一个值</li>
+<li>一个进程只有在值被选中后才能知道这个被选中的值</li>
+</ul>
+<p>活性要求保证了某个被提案的值最终会被选中，如果一个值别选中之后，一个进程最终能够学习到这个值。</p>
+<p>Paxos 算法中包含三类角色，分别是：</p>
+<ul>
+<li>proposers, 提案者：负责对变量的值进行提案</li>
+<li>acceptors，接受者：负责对提案进行决策 —— 接受或者拒绝</li>
+<li>learners，学习者：在值被选中之后，进行学习</li>
+</ul>
+<p>在具体实现中，一个进程可能扮演多种角色。</p>
+<p>假设进程之间可以通过消息进行通信。Paxos 使用常见的，异步的，非拜占庭（non-Byzantine）模型：</p>
+<ul>
+<li>进程以任意速度运行，可能会因为由于崩溃而失败，可能重启。因为，进程完全有可能在一个值被选中后失败，然后重启，所以必须借助持久化存储来保存
+一些决策信息。</li>
+<li>消息会花费任意上的时间，可能会重复，可能会丢失，但是绝不可能被破坏。</li>
+</ul>
+<h2 id=如何选择一个值>如何选择一个值</h2>
+<h3 id=单个-acceptor>单个 Acceptor</h3>
+<p>最简单的方法是只有一个acceptor。一个 proposer 发送一个提案（proposal）给 acceptor，acceptor <strong>接受（accepted）第一个收到的提案</strong>。</p>
+<p>只有一个 Acceptor，最显而易见的问题是：如果它挂掉了，那么共识就无法进行下去。</p>
+<h3 id=多个-acceptor>多个 Acceptor</h3>
+<p>很自然的，我们想到使用多个 Acceptor 来选择一个值。既然有多个 Acceptor，那么 Proposer 将提案发送给多个 Acceptor。只有当足够多
+的Acceptor接受了某个值，那么它才算被选中了。这是多个 Acceptor 下的选择策略。那多少才足够呢？超过半数。1/3 行不行呢？如果有 1/3 的 Acceptor
+选中了某个值，另外 2/3 选中了另外一个值，这样就选中两个值，不满足算法的活性要求。那么 1/2 行不行呢？也是同样的问题。如果超过半数，根据鸽笼原理，
+不可能有两个大小超过半数而没有交集的集合选中不同的值。</p>
+<p>假设我们共有 5 个Acceptor，分别为 S1, S2, S3, S4, S5. 其中：</p>
+<ul>
+<li>S1, S2, S3 选中了值 v1</li>
+<li>S2, S4, S5 选中了值 v2</li>
+</ul>
+<p>集合 {S1, S2, S3} 和 {S2, S4, S5} 之间存在交集 {S2}。如果要达成共识，即 <code>v1 = v2</code> 的话，S2 只能选择一个值。</p>
+<p>因为 S1, S3 和 S2 选择相同， S4, S5 和 S2 选择相同，所以 Acceptor 之间达成了共识。</p>
 </div>
 <footer class=post-footer>
 <div class=addthis_inline_share_toolbox style=text-align:center></div>
@@ -339,7 +388,7 @@
 <ul>
 <li class=post-copyright-title>
 <strong>文章标题：</strong>
-About
+Paxos Simple 阅读笔记
 </li>
 <li class=post-copyright-author>
 <strong>本文作者： </strong>
@@ -347,7 +396,7 @@ NexT 主题
 </li>
 <li class=post-copyright-link>
 <strong>本文链接：</strong>
-<a id=post-cr-link href=/about/ title=About>/about/</a>
+<a id=post-cr-link href=/post/seventh/ title="Paxos Simple 阅读笔记">/post/seventh/</a>
 </li>
 <li class=post-copyright-license>
 <strong>版权声明： </strong>
@@ -380,6 +429,10 @@ NexT 主题
 <div class="post-nav-next post-nav-item">
 </div>
 <div class="post-nav-prev post-nav-item">
+<a href=/post/sixth/ rel=prev title=生命里平淡的一天>
+生命里平淡的一天
+<i class="fa fa-chevron-right"></i>
+</a>
 </div>
 </div>
 </footer>
