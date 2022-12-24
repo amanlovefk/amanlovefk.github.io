@@ -15,7 +15,7 @@
 baseURL: /
 # 站点标题
 # Website title
-title: Hugo NexT
+title: 白夜的博客
 # 主题名称
 # Theme name
 theme: next
@@ -134,21 +134,21 @@ menus:
       pageref: /about.html
       pre: user
       weight: 2
-    - identifier: flinks
-      name: 站点示例
-      pageref: /flinks.html
-      pre: thumbs-up
-      weight: 3
+#    - identifier: flinks
+#      name: 站点示例
+#      pageref: /flinks.html
+#      pre: thumbs-up
+#      weight: 3
     - identifier: archives
       name: 归档
       pageref: /archives
       pre: archive
       weight: 4
-    - identifier: commonweal
-      name: 公益 404
-      url: /404.html
-      pre: heartbeat
-      weight: 5
+#    - identifier: commonweal
+#      name: 公益 404
+#      url: /404.html
+#      pre: heartbeat
+#      weight: 5
 
 #-----------------------------------------
 # Hugo NexT 主题参数配置
@@ -180,9 +180,9 @@ params:
 
   # 站点基本信息
   # Site Information Settings
-  author: NexT 主题
-  subtitle: 为 Hugo 打造的主题
-  description: 保持简单的易用性和强大的功能。
+  author: 白夜
+  subtitle: 白夜的博客
+  description: 雨水落进大海
   keywords: Hugo,NexT,主题,简单,强大
 
   # 不同尺寸站点图标
@@ -314,9 +314,9 @@ params:
   # Key is the link label order.
   # Value before `||` delimiter is the target permalink, value after `||` delimiter is the name of Font Awesome icon.
   socials: 
-    social0: Github || https://github.com/elkan1788 || fab fa-github
+#    social0: Github || https://github.com/elkan1788 || fab fa-github
     #social1: E-Mail || mailto:yourname@gmail.com || fa fa-envelope
-    social2: 知乎 || https://www.zhihu.com/people/lisenhui || fa fa-book
+#    social2: 知乎 || https://www.zhihu.com/people/lisenhui || fa fa-book
     #Google: https://plus.google.com/yourname || fab fa-google
     #Twitter: https://twitter.com/yourname || fab fa-twitter
     #FB Page: https://www.facebook.com/yourname || fab fa-facebook
@@ -388,7 +388,7 @@ params:
   footer:
     # 启动谷歌翻译功能
     # Enable google translate in footer
-    translate: true
+    translate: false
     # 站点开始年份，默认为当下时间的年份
     # Specify the year when the site was setup. 
     # If not defined, current year will be used.
@@ -419,7 +419,7 @@ params:
     # Beian ICP and gongan information for Chinese users. 
     # See: https://beian.miit.gov.cn, http://www.beian.gov.cn
     beian:
-      enable: true
+      enable: false
       # ICP 备案的具体信息
       icp: 粤ICP备 18047355-1 号
       # 公安网备的省份简称
@@ -430,7 +430,7 @@ params:
     # 站点支持供应商列表
     # Vendors list who support website. 
     vendors:
-      enable: true
+      enable: false
       # 支持说明
       # Some support information description.
       title: 提供CDN/云资源支持
@@ -496,7 +496,7 @@ params:
     # 是否开启捐赠按钮，开启后将在每个文章页面底部显示
     # If true, a donate button will be displayed 
     # in every article by default.
-    enable: true
+    enable: false
     # 是否开启捐赠方式的动画效果
     # If true, the donate type title will with animation.
     animation: true
@@ -520,14 +520,14 @@ params:
   followMe:
     #channel0: Twitter || https://twitter.com/username || fab fa-twitter
     #channel1: Telegram || https://t.me/channel_name || fab fa-telegram
-    channel2: WeChat || /images/wechat_channel.jpg || fab fa-weixin
-    channel3: RSS || /atom.xml || fa fa-rss
+#    channel2: WeChat || /images/wechat_channel.jpg || fab fa-weixin
+#    channel3: RSS || /atom.xml || fa fa-rss
 
   # 文章的在线编辑
   # Post edit
   # Easily browse and edit blog source code online.
   postEdit:
-    enable: true
+    enable: false
     url: https://github.com/user-name/repo-name/tree/branch-name/subdirectory-name/
 
 
@@ -623,7 +623,7 @@ params:
   githubBanner:
     # 是否开启显示
     # If true, will display banner.
-    enable: true
+    enable: false
     # 你的 Github 仓库地址
     # Your repository url on Github.
     permalink: https://github.com/hugo-next
@@ -994,7 +994,7 @@ params:
   # Gitter Support
   # For more information: https://gitter.im
   gitter:
-    enable: true
+    enable: false
     room: hugo-next/community
 
 

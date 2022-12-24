@@ -1756,7 +1756,13 @@ header.header {
   -moz-transition: top .3s;
   -webkit-transition: top .3s;
   -o-transition: top .3s;
-  left: 30px;
+  right: 30px;
+}
+
+@media (max-width: 991px) {
+  .book-mark-link {
+    right: 16px;
+  }
 }
 
 @media (max-width: 991px) {
@@ -1776,47 +1782,6 @@ header.header {
 
 .book-mark-link:hover, .book-mark-link-fixed {
   top: -2px;
-}
-
-@keyframes octocat-wave {
-  0%, 100% {
-    transform: rotate(0);
-  }
-  20%, 60% {
-    transform: rotate(-25deg);
-  }
-  40%, 80% {
-    transform: rotate(10deg);
-  }
-}
-
-.github-corner :hover .octo-arm {
-  animation: octocat-wave 560ms ease-in-out;
-}
-
-.github-corner svg {
-  color: white;
-  fill: var(--theme-color);
-  position: absolute;
-  right: 0;
-  top: 0;
-  z-index: 5;
-}
-
-@media (max-width: 991px) {
-  .github-corner {
-    display: none;
-  }
-  .github-corner svg {
-    color: var(--theme-color);
-    fill: white;
-  }
-  .github-corner .github-corner:hover .octo-arm {
-    animation: none;
-  }
-  .github-corner .github-corner .octo-arm {
-    animation: octocat-wave 560ms ease-in-out;
-  }
 }
 
 .sidebar-inner, .sidebar-card-widget {
@@ -2363,12 +2328,6 @@ header.header {
   animation: beat 1.33s ease-in-out infinite;
 }
 
-.beian img {
-  display: inline-block;
-  margin: 0 3px;
-  vertical-align: middle;
-}
-
 /*
 // < 767px
 @include mobile() {
@@ -2867,25 +2826,6 @@ header.header {
   font-weight: normal;
   margin: initial;
   overflow-wrap: break-word;
-}
-
-.posts-expand .post-title .post-edit-link {
-  border-bottom: 0;
-  color: #bbb;
-  float: right;
-  font-size: 1.25em;
-  margin-left: -1.2em;
-  transition: color 0.2s ease-in;
-}
-
-@media (max-width: 567px) {
-  .posts-expand .post-title .post-edit-link {
-    margin-left: initial;
-  }
-}
-
-.posts-expand .post-title .post-edit-link:hover {
-  color: #fc6423;
 }
 
 .posts-expand .post-title-link {
@@ -3818,11 +3758,6 @@ mark.search-keyword {
 .search-popup .search-result-icon {
   color: #ccc;
   margin: auto;
-}
-
-.gitter-open-chat-button {
-  right: auto !important;
-  left: 10px !important;
 }
 
 .wl-actions > button:nth-child(3) {
