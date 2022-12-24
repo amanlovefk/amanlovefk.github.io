@@ -79,7 +79,7 @@
 </li>
 <li class="menu-item menu-item-archives">
 <a href=/ class=hvr-icon-pulse rel=section><i class="fa fa-archive hvr-icon"></i>归档
-<span class=badge>7</span>
+<span class=badge>5</span>
 </a>
 </li>
 <li class="menu-item menu-item-search">
@@ -128,12 +128,8 @@
 <div class="post-toc-wrap sidebar-panel">
 <div class="post-toc animated"><nav id=TableOfContents>
 <ul>
-<li>
-<ul>
 <li><a href=#basic-paxos>Basic Paxos</a></li>
 <li><a href=#multi-paxos>Multi Paxos</a></li>
-</ul>
-</li>
 </ul>
 </nav></div>
 </div>
@@ -147,7 +143,7 @@
 <nav class=site-state>
 <div class="site-state-item site-state-posts">
 <a href=/archives/>
-<span class=site-state-item-count>7</span>
+<span class=site-state-item-count>5</span>
 <span class=site-state-item-name>日志</span>
 </a>
 </div>
@@ -196,7 +192,7 @@
 <div class=siteinfo>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa-solid fa-calendar-check"></i>已运行：</div>
-<div class=item-count id=runTimes data-publishdate=2022-12-18T12:28:20+08:00></div>
+<div class=item-count id=runTimes data-publishdate=2022-12-19T13:36:20+08:00></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name>
@@ -212,15 +208,15 @@
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-font"></i>总字数：</div>
-<div class=item-count id=wordsCount data-count=4933></div>
+<div class=item-count id=wordsCount data-count=8918></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-mug-hot"></i>阅读约：</div>
-<div class=item-count id=readTimes data-times=13></div>
+<div class=item-count id=readTimes data-times=20></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-clock-rotate-left"></i>最后更新于：</div>
-<div class=item-count id=last-push-date data-lastpushdate=2022-12-23T19:37:07+08:00></div>
+<div class=item-count id=last-push-date data-lastpushdate=2022-12-24T16:30:50+08:00></div>
 </div>
 </div>
 </div>
@@ -255,7 +251,7 @@
 </span>
 <span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
 <meta itemprop=name content="Paxos 算法资料整理">
-<meta itemprop=description content="Basic Paxos Paxos Made Simple - Leslie Lamport 帮助我们一步步推导出 Paxos 算法 Multi Paxos Implementing Replicated Logs with Paxos - Diego Ongaro PPT的讲解视频 用paxos实现多副本日志系统&ndash;basic paxo">
+<meta itemprop=description content="Basic Paxos Paxos Made Simple - Leslie Lamport 可靠分布式系统-paxos的直观解释 可靠分布式系统-paxos的直观解释.pdf Multi Paxos Implementing Replicated Logs with Paxos - Diego Ongaro Paxos lecture (Raft user study) 用paxos实">
 </span>
 <header class=post-header>
 <h1 class=post-title itemprop="name headline">Paxos 算法资料整理 </h1>
@@ -274,7 +270,7 @@
 <span class=post-meta-item-icon>
 <i class="far fa-file-word"></i>
 </span>
-<span class=post-meta-item-text>字数：</span><span>107</span>
+<span class=post-meta-item-text>字数：</span><span>131</span>
 </span>
 <span class=post-meta-item title=阅读>
 <span class=post-meta-item-icon>
@@ -298,22 +294,31 @@
 </div>
 </header>
 <div class="post-body autonumber" itemprop=articleBody>
-<h3 id=basic-paxos>Basic Paxos</h3>
+<h2 id=basic-paxos>Basic Paxos</h2>
 <p>
 <a href=https://lamport.azurewebsites.net/pubs/paxos-simple.pdf title="Paxos Made Simple - Leslie Lamport" rel="noopener external nofollow noreferrer" target=_blank class=exturl>
 Paxos Made Simple - Leslie Lamport
 <i class="fa fa-external-link-alt"></i>
 </a></p>
-<p>帮助我们一步步推导出 Paxos 算法</p>
-<h3 id=multi-paxos>Multi Paxos</h3>
+<p>
+<a href=https://blog.openacid.com/algo/paxos/ title=可靠分布式系统-paxos的直观解释 rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+可靠分布式系统-paxos的直观解释
+<i class="fa fa-external-link-alt"></i>
+</a></p>
+<p>
+<a href=https://blog.openacid.com/post-res/paxos/%E5%8F%AF%E9%9D%A0%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F-paxos%E7%9A%84%E7%9B%B4%E8%A7%82%E8%A7%A3%E9%87%8A.pdf title=可靠分布式系统-paxos的直观解释.pdf rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+可靠分布式系统-paxos的直观解释.pdf
+<i class="fa fa-external-link-alt"></i>
+</a></p>
+<h2 id=multi-paxos>Multi Paxos</h2>
 <p>
 <a href=https://ongardie.net/static/raft/userstudy/paxos.pdf title="Implementing Replicated Logs with Paxos - Diego Ongaro" rel="noopener external nofollow noreferrer" target=_blank class=exturl>
 Implementing Replicated Logs with Paxos - Diego Ongaro
 <i class="fa fa-external-link-alt"></i>
 </a></p>
 <p>
-<a href="https://www.youtube.com/watch?v=JEpsBg0AO6o" title=PPT的讲解视频 rel="noopener external nofollow noreferrer" target=_blank class=exturl>
-PPT的讲解视频
+<a href="https://www.youtube.com/watch?v=JEpsBg0AO6o" title="Paxos lecture (Raft user study)" rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+Paxos lecture (Raft user study)
 <i class="fa fa-external-link-alt"></i>
 </a></p>
 <p>
@@ -353,13 +358,13 @@ Paxos 算法资料整理
 </div>
 <div class=post-nav>
 <div class="post-nav-next post-nav-item">
-<a href=/post/sixth/ rel=next title=生命里平淡的一天>
-<i class="fa fa-chevron-left"></i> 生命里平淡的一天
+<a href=/post/seventh/ rel=next title="Paxos Simple 阅读笔记">
+<i class="fa fa-chevron-left"></i> Paxos Simple 阅读笔记
 </a>
 </div>
 <div class="post-nav-prev post-nav-item">
-<a href=/post/fourth/ rel=prev title=无题>
-无题
+<a href=/post/third/ rel=prev title=一些Windows下小工具推荐>
+一些Windows下小工具推荐
 <i class="fa fa-chevron-right"></i>
 </a>
 </div>
