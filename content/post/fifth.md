@@ -4,17 +4,19 @@ date: 2022-12-20T19:18:27+08:00
 draft: false
 ---
 
-### Basic Paxos
+## Basic Paxos
 
 [Paxos Made Simple - Leslie Lamport](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)
 
-帮助我们一步步推导出 Paxos 算法
+[可靠分布式系统-paxos的直观解释](https://blog.openacid.com/algo/paxos/)
 
-### Multi Paxos
+[可靠分布式系统-paxos的直观解释.pdf](https://blog.openacid.com/post-res/paxos/%E5%8F%AF%E9%9D%A0%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F-paxos%E7%9A%84%E7%9B%B4%E8%A7%82%E8%A7%A3%E9%87%8A.pdf)
+
+## Multi Paxos
 
 [Implementing Replicated Logs with Paxos - Diego Ongaro](https://ongardie.net/static/raft/userstudy/paxos.pdf)
 
-[PPT的讲解视频](https://www.youtube.com/watch?v=JEpsBg0AO6o)
+[Paxos lecture (Raft user study)](https://www.youtube.com/watch?v=JEpsBg0AO6o)
 
 [用paxos实现多副本日志系统--basic paxos部分](https://cloud.tencent.com/developer/article/1147420)
 
