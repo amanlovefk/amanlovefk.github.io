@@ -1,0 +1,554 @@
+<!doctype html><html lang=zh-cn data-theme=dark>
+<head><meta charset=utf-8>
+<meta name=viewport content="width=device-width">
+<meta name=theme-color content="#222" media="(prefers-color-scheme: dark)">
+<meta name=generator content="Hugo 0.91.2">
+<link rel="shortcut icon" type=image/x-icon href=/imgs/icons/favicon.ico>
+<link rel=icon type=image/x-icon href=/imgs/icons/favicon.ico>
+<link rel=icon type=image/png sizes=16x16 href=/imgs/icons/favicon_16x16_next.png>
+<link rel=icon type=image/png sizes=32x32 href=/imgs/icons/favicon_32_32_next.png>
+<link rel=apple-touch-icon sizes=180x180 href=/imgs/icons/apple_touch_icon_next.png>
+<meta itemprop=name content="Understanding Paxos">
+<meta itemprop=description content="雨水落进大海">
+<meta itemprop=datePublished zgotmplz>
+<meta itemprop=dateModified zgotmplz>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=keywords content="Hugo,NexT,主题,简单,强大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Understanding Paxos">
+<meta property="og:description" content="雨水落进大海">
+<meta property="og:image" content="/imgs/hugo_next_avatar.png">
+<meta property="og:image:width" content="312">
+<meta property="og:image:height" content="312">
+<meta property="og:image:type" content="image/jpeg/png/svg/jpg">
+<meta property="og:url" content="/post/understanding_paxos/">
+<meta property="og:site_name" content="白夜的博客">
+<meta property="og:locale" content="zh-CN">
+<meta property="article:author" content="白夜">
+<meta property="article:published_time" content="2022-12-25 10:42:59 +0800 +0800">
+<meta property="article:modified_time" content="2022-12-25 10:42:59 +0800 +0800">
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/font-awesome/6.1.2/css/all.min.css>
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/animate.css/3.1.1/animate.min.css>
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.css>
+<link rel=stylesheet href=/css/main.min.65039c30ace25fd8416b5f880bc59d53bd242140b765f5547417a73434033aa5.css>
+<style type=text/css>.post-footer,.flinks-list-footer hr:after{content:"~ 我可是有底线的哟 ~"}</style>
+<script type=text/javascript>(function(){localDB={set:function(b,c,a){if(a===0)return;const d=new Date,e=a*864e5,f={value:c,expiry:d.getTime()+e};localStorage.setItem(b,JSON.stringify(f))},get:function(a){const b=localStorage.getItem(a);if(!b)return void 0;const c=JSON.parse(b),d=new Date;return d.getTime()>c.expiry?(localStorage.removeItem(a),void 0):c.value}},theme={active:function(){const a=localDB.get('theme');if(a==void 0)return;theme.toggle(a),window.matchMedia("(prefers-color-scheme: dark)").addListener(function(a){theme.toggle(a.matches?'dark':'light')})},toggle:function(a){document.documentElement.setAttribute('data-theme',a),localDB.set('theme',a,2);const b=document.querySelector('iframe.giscus-frame');if(b){const c={setConfig:{theme:a}};b.contentWindow.postMessage({giscus:c},'https://giscus.app')}}},theme.active()})(window)</script>
+<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"path":"understanding_paxos","permalink":"/post/understanding_paxos/","title":"Understanding Paxos","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
+<script type=text/javascript>document.addEventListener('DOMContentLoaded',()=>{var a=document.createElement('script');a.charset="UTF-8",a.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js",a.async=!1,a.defer=!0,document.head.appendChild(a),a.onload=function(){NexT.utils.fmtBusuanzi()}})</script>
+<title>Understanding Paxos - 白夜的博客</title>
+<noscript>
+<link rel=stylesheet href=/css/noscript.css>
+</noscript>
+</head>
+<body itemscope itemtype=http://schema.org/WebPage class=use-motion>
+<div class=headband></div>
+<main class=main>
+<header class=header itemscope itemtype=http://schema.org/WPHeader>
+<div class=header-inner>
+<div class=site-brand-container>
+<div class=site-nav-toggle>
+<div class=toggle aria-label=切换导航栏 role=button>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+</div>
+</div>
+<div class=site-meta>
+<a href=/ class=brand rel=start>
+<i class=logo-line></i>
+<h1 class=site-title>白夜的博客</h1>
+<i class=logo-line></i>
+</a>
+<p class=site-subtitle itemprop=description>白夜的博客</p>
+</div>
+<div class=site-nav-right>
+<div class="toggle popup-trigger">
+<i class="fa fa-search fa-fw fa-lg"></i>
+</div>
+</div>
+</div>
+<nav class=site-nav>
+<ul class="main-menu menu">
+<li class="menu-item menu-item-home">
+<a href=/ class=hvr-icon-pulse rel=section><i class="fa fa-home hvr-icon"></i>首页
+</a>
+</li>
+<li class="menu-item menu-item-about">
+<a href=/about/ class=hvr-icon-pulse rel=section><i class="fa fa-user hvr-icon"></i>关于
+</a>
+</li>
+<li class="menu-item menu-item-archives">
+<a href=/ class=hvr-icon-pulse rel=section><i class="fa fa-archive hvr-icon"></i>归档
+<span class=badge>6</span>
+</a>
+</li>
+<li class="menu-item menu-item-search">
+<a role=button class="popup-trigger hvr-icon-pulse"><i class="fa fa-search fa-fw hvr-icon"></i>搜索
+</a>
+</li>
+</ul>
+</nav>
+<div class=search-pop-overlay>
+<div class="popup search-popup">
+<div class=search-header>
+<span class=search-icon>
+<i class="fa fa-search"></i>
+</span>
+<div class=search-input-container>
+<input autocomplete=off autocapitalize=off maxlength=80 placeholder=搜索... spellcheck=false type=search class=search-input>
+</div>
+<span class=popup-btn-close role=button>
+<i class="fa fa-times-circle"></i>
+</span>
+</div>
+<div class="search-result-container no-result">
+<div class=search-result-icon>
+<i class="fa fa-spinner fa-pulse fa-5x"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toggle sidebar-toggle" role=button>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+</div>
+<aside class=sidebar>
+<div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+<ul class=sidebar-nav>
+<li class=sidebar-nav-toc>
+文章目录
+</li>
+<li class=sidebar-nav-overview>
+站点概览
+</li>
+</ul>
+<div class=sidebar-panel-container>
+<div class="post-toc-wrap sidebar-panel">
+<div class="post-toc animated"><nav id=TableOfContents>
+<ul>
+<li><a href=#the-consensus-problem>The Consensus Problem</a></li>
+<li><a href=#paxos>Paxos</a></li>
+<li><a href=#what-we-need-in-a-distributed-consensus-protocol>What we need in a distributed consensus protocol</a>
+<ul>
+<li><a href=#multiple-proposers-single-acceptor>Multiple proposers, single acceptor</a></li>
+<li><a href=#fault-tolerance-multiple-acceptors>Fault tolerance: multiple acceptors</a></li>
+</ul>
+</li>
+<li><a href=#how-paxos-works>How Paxos works</a>
+<ul>
+<li><a href=#the-case-of-characters>The case of characters</a></li>
+<li><a href=#what-paxos-does>What Paxos does</a></li>
+<li><a href=#the-paxos-protocol-initial-version>The Paxos protocol (initial version)</a></li>
+<li><a href=#failure-examples>Failure examples</a>
+<ul>
+<li><a href=#acceptor-fails-in-phase-1>Acceptor fails in phase 1</a></li>
+<li><a href=#acceptor-fails-in-phase-2>Acceptor fails in phase 2</a></li>
+<li><a href=#proposer-fails-in-the-prepare-phase>Proposer fails in the Prepare phase</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="site-overview-wrap sidebar-panel">
+<div class="site-author site-overview-item animated" itemprop=author itemscope itemtype=http://schema.org/Person>
+<img class=site-author-image itemprop=image alt=白夜 src=/imgs/img-lazy-loading.gif data-src=/imgs/hugo_next_avatar.png>
+<p class=site-author-name itemprop=name>白夜</p>
+<div class=site-description itemprop=description>雨水落进大海</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+<nav class=site-state>
+<div class="site-state-item site-state-posts">
+<a href=/archives/>
+<span class=site-state-item-count>6</span>
+<span class=site-state-item-name>日志</span>
+</a>
+</div>
+<div class="site-state-item site-state-categories">
+<a href=/categories/>
+<span class=site-state-item-count>0</span>
+<span class=site-state-item-name>分类</span>
+</a>
+</div>
+<div class="site-state-item site-state-tags">
+<a href=/tags/>
+<span class=site-state-item-count>0</span>
+<span class=site-state-item-name>标签</span>
+</a>
+</div>
+</nav>
+</div>
+<div class="links-of-social site-overview-item animated">
+</div>
+<div class="cc-license animated" itemprop=license>
+<a href=https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh class=cc-opacity rel=noopener target=_blank title=共享知识>
+<img src=/imgs/img-lazy-loading.gif data-src=/imgs/cc/big/by_nc_sa.svg alt=共享知识>
+</a>
+</div>
+<div class="links-of-blogroll site-overview-item animated">
+<div class=links-of-blogroll-title>
+<i class="fa fa-globe fa-fw"></i>友情链接
+</div>
+<ul class=links-of-blogroll-list>
+<li class=links-of-blogroll-item>
+<a href=https://gitee.com/hugo-next/hugo-theme-next title=https://gitee.com/hugo-next/hugo-theme-next target=_blank>Hugo-NexT</a>
+</li>
+<li class=links-of-blogroll-item>
+<a href=https://lisenhui.cn title=https://lisenhui.cn target=_blank>凡梦星尘空间站</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id=siteinfo-card-widget class=sidebar-card-widget>
+<div class=item-headline>
+<i class="fas fa-chart-line"></i>
+<span>网站资讯</span>
+</div>
+<div class=siteinfo>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa-solid fa-calendar-check"></i>已运行：</div>
+<div class=item-count id=runTimes data-publishdate=2022-12-19T13:36:20+08:00></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name>
+<i class="fas fa fa-user"></i>总访客数：
+</div>
+<div class=item-count id=busuanzi_value_site_uv><i class="fa fa-sync fa-spin"></i></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name>
+<i class="fas fa fa-eye"></i>页面浏览：
+</div>
+<div class=item-count id=busuanzi_value_site_pv><i class="fa fa-sync fa-spin"></i></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-font"></i>总字数：</div>
+<div class=item-count id=wordsCount data-count=11307></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-mug-hot"></i>阅读约：</div>
+<div class=item-count id=readTimes data-times=25></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-clock-rotate-left"></i>最后更新于：</div>
+<div class=item-count id=last-push-date data-lastpushdate=2022-12-25T10:42:59+08:00></div>
+</div>
+</div>
+</div>
+</aside>
+<div class=sidebar-dimmer></div>
+</header>
+<div class=tool-buttons>
+<div id=toggle-theme class=button title=深浅模式切换>
+<i class="fas fa-adjust"></i>
+</div>
+<div class=back-to-top role=button title=返回顶部>
+<i class="fa fa-arrow-up"></i>
+<span>0%</span>
+</div>
+</div>
+<div class=reading-progress-bar></div>
+<a role=button class="book-mark-link book-mark-link-fixed"></a>
+<noscript>
+<div class=noscript-warning>Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="main-inner post posts-expand">
+<div class=post-block>
+<article itemscope itemtype=http://schema.org/Article class=post-content lang>
+<link itemprop=mainEntityOfPage href=/post/understanding_paxos/>
+<span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=name content="白夜">
+</span>
+<span hidden itemprop=publisher itemscope itemtype=http://schema.org/Organization>
+<meta itemprop=name content="白夜">
+<meta itemprop=description content="雨水落进大海">
+</span>
+<span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
+<meta itemprop=name content="Understanding Paxos">
+<meta itemprop=description content="https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html The Consensus Problem Suppose you have a collection of computers and want them all to agree on something. This is what consensus about; consensus means agreement. Consensus comes up frequently in distributed system design. There are various reasons why we want it: to agree on who gets access to a resource (mutual exclusion), agree on who is in charge (elections), or to agree on a common ordering of events">
+</span>
+<header class=post-header>
+<h1 class=post-title itemprop="name headline">Understanding Paxos </h1>
+<div class=post-meta-container>
+<div class=post-meta-items>
+<span class=post-meta-item>
+<span class=post-meta-item-icon>
+<i class="far fa-calendar"></i>
+</span>
+<span class=post-meta-item-text>发表于：</span>
+<time title="发表于：2022-12-25 10:42:59 +0800 +0800" itemprop="dateCreated datePublished" datetime="2022-12-25 10:42:59 +0800 +0800">2022-12-25</time>
+</span>
+</div>
+<div class=post-meta-items>
+<span class=post-meta-item title=字数>
+<span class=post-meta-item-icon>
+<i class="far fa-file-word"></i>
+</span>
+<span class=post-meta-item-text>字数：</span><span>2389</span>
+</span>
+<span class=post-meta-item title=阅读>
+<span class=post-meta-item-icon>
+<i class="far fa-clock"></i>
+</span>
+<span class=post-meta-item-text>阅读：&ap;</span>
+<span>5分钟</span>
+</span>
+<span class=post-meta-item title=浏览>
+<span class=post-meta-item-icon>
+<i class="far fa-eye"></i>
+</span>
+<span class=post-meta-item-text>
+浏览：
+</span>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/understanding_paxos/>
+<i class="fa fa-sync fa-spin"></i>
+</span>
+</span>
+</div>
+</div>
+</header>
+<div class="post-body autonumber" itemprop=articleBody>
+<blockquote>
+<p>
+<a href=https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html title=https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html
+<i class="fa fa-external-link-alt"></i>
+</a></p>
+</blockquote>
+<h2 id=the-consensus-problem>The Consensus Problem</h2>
+<p>Suppose you have a collection of computers and want them all to agree on something. This is what <strong>consensus</strong> about;
+consensus means agreement.</p>
+<p>Consensus comes up frequently in distributed system design. There are various reasons why we want it: to agree on who
+gets access to a resource (mutual exclusion), agree on who is in charge (elections), or to agree on a common ordering
+of events among of a collection of computers (e.g. what action to take next, or state machine replication).</p>
+<p>Replication may be the most common use of consensus. We set up collections (clusters) of servers, all of which will
+have replicated content. This provides fault tolerance: if any server dies, others are still running. It also provides
+scale: clients can read data from any available server although writing data will generally require the use of all
+servers and not scale at well. For many applications, though, reads far outnumber writes. To keep the content
+replicated, we have two design choices. We can funnel all write requests through one coordinator, which will ensure
+in-order delivery to all replicas or we can send updates any system but that system will coordinate thoses update with
+its replicas to ensure that all updates are applied in the same order on each replica. In the first case, we need
+consensus to elect that coordinator. In the second case, we need to run a consensus algorithm for each update to ensure
+that everyone agrees on the order.</p>
+<p>The consensus problem can be stated in a basic, generic manner: One or more systems may propose some value. How do we
+get a collection of computers to agree on exactly one of those proposed values ?</p>
+<p>The formal properties for asynchronous consensus are:</p>
+<ul>
+<li>Validity: only the proposed values can be decided. If a process decides on some value, v, then some process must have
+proposed v.</li>
+<li>Uniform Agreement: no two correct processes (those that do not crash) can decide on different values</li>
+<li>Integrity: each process can decide a value at most once.</li>
+<li>Termination: all processes will eventually decide on a result</li>
+</ul>
+<h2 id=paxos>Paxos</h2>
+<p>Paxos is an algorithm that is used to achieve consensus among a distributed set of computers that communicate via an
+asynchronous network. One or more clients propose a value to Paxos and we have consensus when a majority of systems
+running Paxos agrees on of the proposed values. Paxos is widely used and is legendary in computer science it is the
+first consensus algorithm that has been rigorously proved to be correct.</p>
+<p>Paxos simply selects a single value from one or more values that are proposed to it and lets everyone know what that
+value is. A run of the Paxos protocol results in the selection of single proposed value. If you need to use Paxos to
+create a replicated log (for a replicated state machine, for example), then you need to run Paxos repeatedly. This is
+called <strong>multi-Paxos</strong>.</p>
+<p>Paxos provides <strong>abortable consensus</strong>. This means that some processes abort the consensus if there is contention
+while others decide on the value. Those processes that decide have to agree on the same value. Aborting allows a
+process to terminate rather than be blocked indefinitely. When a client proposes a value to Paxos, it is possible that
+the proposed value might fail if there was a completing concurrent proposal that won. The client will then have to
+propose the value again to another run of the Paxos algorithm.</p>
+<p>Our assumptions for the algorithm are:</p>
+<ul>
+<li>Concurrent proposals: One or more systems may propose a value concurrently. If only one system would propose a value
+then it is clear what the consensus would be. With multiple systems, we need to select one from among those values.</li>
+<li>Validity: The chosen value that is agreed upon must be one of the proposed values. The servers cannot just choose a
+random number.</li>
+<li>Majority rule: Once a majority of Paxos servers agrees on one of the proposed values, we have consensus on that value
+. This also implies that a majority of servers need to be functioning for the algorithm to run. To survive m failures,
+we need 2m + 1 systems.</li>
+<li>Asynchronous network:The network is unreliable and asynchronous : messages may get lost or arbitrarily delayed. The
+network may also get partitioned.</li>
+<li>Fail-stop faults: System may exhibit fail-stop faults. They may restart but need to remember there previous state to
+make sure they do not change their mind. Failures are not Byzantine.</li>
+<li>Unicasts: Communication is point-to-point. There is no mechanism to multicast a message atomically to the set of
+Paxos servers.</li>
+<li>Announcement: Once consensus is reached, the results can be make known to everyone.</li>
+</ul>
+<h2 id=what-we-need-in-a-distributed-consensus-protocol>What we need in a distributed consensus protocol</h2>
+<p>We have an environment of multiple systems (nodes), connected by a network, where one or more of these nodes may
+concurrently propose a value (e.g., perform an operation on a server, select a coordinator, add to a log, whatever&mldr;).
+We need a protocol to choose exactly one value in cases where multiple competing values may be proposed.</p>
+<p>We will call the processes that are proposing values <strong>proposers</strong>. We will also have processes called <strong>acceptors</strong>
+that will accept these values and help figure out which one value will be chosen.</p>
+<h3 id=multiple-proposers-single-acceptor>Multiple proposers, single acceptor</h3>
+<p>The simplest attempt to design a consensus protocol will use a single acceptor. We can elect one of our systesm to take
+on this role. Multiple proposers will concurrently propose various to a single acceptor. The acceptor chooses one of
+those proposed values. Unfortunately, this does not handle the case where the acceptor crashes. If it crashes after
+choosing a value, we will not know what value has been chosen and will have to wait for the acceptor to restart. We
+want to design a system that will be functional if the majority of nodes are running.</p>
+<h3 id=fault-tolerance-multiple-acceptors>Fault tolerance: multiple acceptors</h3>
+<p>To achieve fault tolerance, we will use a collection of acceptors. Each proposal will be sent to at least a mojority of
+these acceptors. If a <strong>quorum</strong>, or majority, of these acceptors chooses a particular proposed value (proposal) then
+that value will be considered <strong>chosen</strong>. Even if some acceptors crash, others are up so we will know the outcome. If
+an acceptor crashes after it accepted a proposal, other acceptors know that a value was chosen.</p>
+<p>If an acceptor simply accepts the first proposed value it receives and cannot change its mind, it is possible that we
+may have no majority of accepted value. Depending on the order in which messages arrive at various acceptors, each
+acceptor may choose a different value or small groups of acceptors choose different values such that there is no
+majority of acceptors that choose the same proposed values. This tells us that acceptors may need to change their mind
+about which accepted value to choose. We want a value to be <strong>chosen</strong> only when a majority of acceptors accept the
+value.</p>
+<p>Since we know that an acceptor may need to change its mind, we might consider just having an acceptor accept any value
+given by any proposer. A majority of acceptor may accept a value, which means that value is chosen. However, anothoer
+server may also tell a majority of acceptors to accept another value. Some acceptors will receive both of these
+proposals because to have a mojority means that both sets of proposals have at least one acceptor in common. That means
+at least one acceptor had to change its mind about what value is ultimately chosen, violating the integrity property.
+Once we choose a value, there is no going back.</p>
+<p>To fix this, instead of just having a proposer propose a value, we will first ask it to contact a majority of acceptors
+and check whether a value has already chosen. If it has, then the proposer must propose that chosen value to the other
+acceptors. To implement this, we will need a two-phase protocol; check first and then provide a value.</p>
+<p>Asking a proposer to check is not sufficient. Another proposer may come along after the checking phase and propose a
+different value. What if that second value is accepted by a majority and then the acceptors receive requests from
+the first proposer to accept its value? We again end up with two chosen values. The protocol needs to be modified to
+ensure that once we accept a value, we will abort competing proposals. To do this, Paxos will impose an ordering on
+proposals. Newer proposals will take precedence over old ones. If that first proposer tries to finish its protocol,
+its request will fail.</p>
+<h2 id=how-paxos-works>How Paxos works</h2>
+<h3 id=the-case-of-characters>The case of characters</h3>
+<p>Paxos has three entities:</p>
+<ol>
+<li>Proposers: Receive requests (values) from clients and try to convince acceptors to accept there proposed values.</li>
+<li>Acceptors: Accept certain proposed values from proposers and let proposers know if something else was accepted.
+A response from an acceptor represents a vote for a particular proposal.</li>
+<li>Learners: Announce the outcome</li>
+</ol>
+<p>In practice, a single node may run proposer, acceptor, and learner roles. It is common for Paxos to coexist with the
+service that requires consensus (e.g., distributed storage) on a set of replicated servers, which each server taking
+on all three roles rather than using separate servers dedicated to Paxos. For the sake of discussing the protocol,
+however, we consider these to be independent entities.</p>
+<h3 id=what-paxos-does>What Paxos does</h3>
+<p>A client sends a request to any Paxos proposer. The proposer then runs a two-phase protocol with the acceptors. Paxos
+is a majority-wins proptocol. A majority avoids split-brain problems and ensures that if you made a proposal and asked
+over 50% of the systems if somebody else made a proposal and they all reply non then you know for certain that no
+other system could have asked over 50% of the systems received the same answer. Because of this Paxos requires a
+majority of its servers to be running for the algorithm to terminate. A majority ensures that there is at least one node
+in common from one majority to another if servers die and restart. The system requires 2m+1 servers to tolerate the
+failure of m servers. As we shall see, Paxos requires a majority of acceptors. We can have one or a smaller number of
+proposers and learners.</p>
+<p>Paxos acceptors cannot forget what they accepted, so they need to keep track of the information they received from
+proposers by writing it to stable storage. This is storage such as flash memory or disk, whose contents can be retrieved
+even if the process or system is restarted.</p>
+<h3 id=the-paxos-protocol-initial-version>The Paxos protocol (initial version)</h3>
+<p>Paxos is a two-phase protocol, meaning that the proposers interact with the acceptor twice. At a high level:</p>
+<p>Phase 1: A proposer asks all the working acceptors whether anyone already received a proposal. If the answer is no,
+propose a value.</p>
+<p>Phase 2: If a majority of acceptors agree on to this value then that is our consensus.</p>
+<p>Right now, we will examine the mostly failure-free case. Later, we will augment the algorithm to correct for other
+failures.</p>
+<p>When a proposer receives a client request to reach consensus on a value, the proposer must create a proposal number.
+This number must have two properties:</p>
+<ol>
+<li>It must be unique. No two proposers can come up with the same number.</li>
+<li>It must be bigger than any previously used identifier used in the cluster. A proposer may use an incrementing counter
+or use a nanosecond-level timestamp to achieve this. If the number is not bigger than one previously used, the proposer
+will find out by having its proposal rejected and will have to try again.</li>
+</ol>
+<p>Prepare 请求的作用：</p>
+<ol>
+<li>
+<p>查找到可能已经选中的值。</p>
+</li>
+<li>
+<p>帮助未完成的proposal继续完成提案</p>
+</li>
+<li>
+<p>避免造成分裂的情况，比如 {S1, S2}, {S3}, {S4, S5}，先和 acceptor 打好招呼，不要接收比我编号更小的。比我更大的可以，因为当前 proposer
+可以会挂掉，在它重启后可以选择一个更大的编号来中断之前未完成的提案过程；或者，其他的proposer替我继续这未完的旅程。</p>
+</li>
+</ol>
+<h3 id=failure-examples>Failure examples</h3>
+<h4 id=acceptor-fails-in-phase-1>Acceptor fails in phase 1</h4>
+<p>Suppose an acceptor fails during phase 1. That means it will not return a <strong>PROMISE</strong> message. As long as the proposer
+still gets response from a majority of acceptors, the protocol can continue to make progress.</p>
+<h4 id=acceptor-fails-in-phase-2>Acceptor fails in phase 2</h4>
+<p>Suppose an acceptor fails during phase 2. That means it will not be able to send back an <strong>ACCEPTED</strong> message. This is
+also not a problem as long as enough of the acceptors are still alive and will respond so that the proposer or learner
+receives responses from a majority of acceptors.</p>
+<h4 id=proposer-fails-in-the-prepare-phase>Proposer fails in the Prepare phase</h4>
+<p>If the proposer fails before it sent any messages, then it is the same as it did not run at all.</p>
+<p>What if the proposer fails after sending one or more <strong>PREPARE</strong> msgs? An acceptor would have sent <strong>PROMISE</strong> responses
+back but no ACCEPT messages would follow, so there would be no consensus. Some other node will eventually run its
+version of Paxos and run as a proposer, picking its own ID. If the higher ID number works, then the algorithm runs.
+Otherwise, the proposer would have its request rejected and have to pick a higher ID number.</p>
+<p>What if the proposer fails during the ACCEPT phase? At least one ACCEPT message was sent. Some another node proposes a
+new message with PREPARE(higher-ID). The acceptor responds by telling that proposer that an earlier proposal was already
+accepted. PROMISE(higher-ID, &lt;old_ID, Value>)</p>
+<p>If a proposer gets any PROMISE responses with a value then it must choose the response with the highest accepted ID
+and change its own value. It sends out: <code>ACCEPT(higher-ID, Value)</code></p>
+<p>If proposer fails in the ACCEPT phase, any proposer that takes over finishes the job of propagating the old value that
+was accepted.</p>
+</div>
+<footer class=post-footer>
+<div class=addthis_inline_share_toolbox style=text-align:center></div>
+<hr>
+<div class=post-copyright>
+<img src=/imgs/cc/cc.svg width=75 height=75 align=right>
+<ul>
+<li class=post-copyright-title>
+<strong>文章标题：</strong>
+Understanding Paxos
+</li>
+<li class=post-copyright-author>
+<strong>本文作者： </strong>
+白夜
+</li>
+<li class=post-copyright-link>
+<strong>本文链接：</strong>
+<a id=post-cr-link href=/post/understanding_paxos/ title="Understanding Paxos">/post/understanding_paxos/</a>
+</li>
+<li class=post-copyright-license>
+<strong>版权声明： </strong>
+本博客所有文章除特别声明外，均采用 <i class="fab fa-fw fa-creative-commons"></i><a target=_blank href=https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh>BY-NC-SA</a> 许可协议。转载请注明出处！
+</li>
+</ul>
+</div>
+<div class=post-nav>
+<div class="post-nav-next post-nav-item">
+</div>
+<div class="post-nav-prev post-nav-item">
+<a href=/post/eight/ rel=prev title="Basic Paxos Deduction From single Proposer's Perspective">
+Basic Paxos Deduction From single Proposer's Perspective
+<i class="fa fa-chevron-right"></i>
+</a>
+</div>
+</div>
+</footer>
+</article>
+</div>
+</div>
+</main>
+<footer class=footer>
+<div class=footer-inner>
+<div class=copyright>
+&copy;
+<span itemprop=copyrightYear>
+2010 - 2022
+</span>
+<span class=with-love>
+<i class="fa fa-heart"></i>
+</span>
+<span class=author itemprop=copyrightHolder>白夜</span>
+</div>
+<div class=powered-by>
+由 <a href=https://gohugo.io title=0.91.2 target=_blank>Hugo</a> & <a href=https://github.com/hugo-next/hugo-theme-next title=4.4.1 target=_blank>Hugo NexT.Gemini</a> 强力驱动
+</div>
+</div>
+</footer>
+<script type=text/javascript src=https://cdn.staticfile.org/animejs/3.2.1/anime.min.js defer></script>
+<script type=text/javascript src=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.js defer></script>
+<script class=next-config data-name=main type=application/json>{"bookmark":{"color":"#222","enable":true,"save":"manual"},"busuanzi":{"pageview":true},"copybtn":true,"darkmode":true,"giscus":{"cfg":{"category":"Comments","categoryid":null,"emit":false,"inputposition":"top","mapping":"title","reactions":false,"repo":"username/repo-name","repoid":null,"theme":"preferred_color_scheme"},"js":"https://giscus.app/client.js"},"hostname":"/","i18n":{"ds_day":" 天前","ds_days":" 天 ","ds_hour":" 小时前","ds_hours":" 小时 ","ds_just":"刚刚","ds_min":" 分钟前","ds_mins":" 分钟","ds_month":" 个月前","ds_years":" 年 ","empty":"没有找到任何搜索结果：${query}","hits":"","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","placeholder":"搜索..."},"lang":"zh-CN","lazyload":false,"localSearch":{"enable":true,"path":"/searchindexes.xml","preload":false,"topnperarticle":-1,"trigger":"auto","unescape":false},"motion":{"async":true,"enable":true,"transition":{"collheader":"fadeInLeft","postblock":"fadeIn","postbody":"fadeInDown","postheader":"fadeInDown","sidebar":"fadeInUp"}},"root":"/","scheme":"Gemini","sidebar":{"display":"post","offset":12,"padding":18,"position":"left","width":256},"statis":{"enable":true,"plugin":"busuanzi"},"vendor":{"plugins":"qiniu","router":"https://cdn.staticfile.org"},"version":"4.4.1","waline":{"cfg":{"comment":true,"emoji":false,"imguploader":false,"pageview":true,"placeholder":"请文明发言哟 ヾ(≧▽≦*)o","reaction":true,"reactiontext":["点赞","踩一下","得意","不屑","尴尬","睡觉"],"reactiontitle":"你认为这篇文章怎么样？","requiredmeta":["nick","mail"],"serverurl":null,"sofa":"快来发表你的意见吧 (≧∀≦)ゞ","wordlimit":200},"css":{"alias":"waline","file":"dist/waline.css","name":"@waline/client","version":"2.13.0"},"js":{"alias":"waline","file":"dist/waline.js","name":"@waline/client","version":"2.13.0"}}}</script>
+<script type=text/javascript src=/js/main.min.7febcb46102ea06b82e271e7dbfc83e80e09db236fb807f26dc461d893d6d2e4.js defer></script>
+</body>
+</html>
