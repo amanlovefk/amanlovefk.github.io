@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><search><entry><title>结局是注定的</title><url>/post/20221228_01/</url><categories/><tags/><content type="html">反正要死的，何必着急呢。</content></entry><entry><title>Understanding Paxos</title><url>/post/understanding_paxos/</url><categories/><tags/><content type="html"> https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><search><entry><title>理解Paxos算法的几种建模方法</title><url>/post/20221229_01/</url><categories/><tags/><content type="html">从并发编程锁的角度 Paxos made simple 论文导读
+两阶段是先加锁再操作的过程； 引入编号是抢占锁的设计 多数派是为了获取集群的锁（鸽笼原理） 选择最大编号的提案是为了快速收敛 从多数派写的角度 可靠分布式系统-paxos的直观解释
+Request promise before write 从原论文的角度 从零开始推导，不断加强约束，最后得到完整的算法过程。
+https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html</content></entry><entry><title>Understanding Paxos</title><url>/post/understanding_paxos/</url><categories/><tags/><content type="html"> https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html
 The Consensus Problem Suppose you have a collection of computers and want them all to agree on something. This is what consensus about; consensus means agreement.
 Consensus comes up frequently in distributed system design. There are various reasons why we want it: to agree on who gets access to a resource (mutual exclusion), agree on who is in charge (elections), or to agree on a common ordering of events among of a collection of computers (e.g. what action to take next, or state machine replication).
 Replication may be the most common use of consensus. We set up collections (clusters) of servers, all of which will have replicated content. This provides fault tolerance: if any server dies, others are still running. It also provides scale: clients can read data from any available server although writing data will generally require the use of all servers and not scale at well. For many applications, though, reads far outnumber writes. To keep the content replicated, we have two design choices. We can funnel all write requests through one coordinator, which will ensure in-order delivery to all replicas or we can send updates any system but that system will coordinate thoses update with its replicas to ensure that all updates are applied in the same order on each replica. In the first case, we need consensus to elect that coordinator. In the second case, we need to run a consensus algorithm for each update to ensure that everyone agrees on the order.
@@ -127,6 +130,8 @@ proposer 要求 acceptor 不在接受任意编号小于 n 的提案。这样就�
 上面两步描述了 proposer 的算法。acceptor 的算法是怎样的呢？</content></entry><entry><title>Paxos 算法资料整理</title><url>/post/fifth/</url><categories/><tags/><content type="html">Basic Paxos Paxos Made Simple - Leslie Lamport
 可靠分布式系统-paxos的直观解释
 可靠分布式系统-paxos的直观解释.pdf
+Paxos made simple 论文导读
+知行学社——paxos和分布式系统
 Multi Paxos Implementing Replicated Logs with Paxos - Diego Ongaro
 Paxos lecture (Raft user study)
 用paxos实现多副本日志系统&amp;ndash;basic paxos部分
