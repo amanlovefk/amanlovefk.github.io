@@ -12,6 +12,10 @@ draft: false
 
 [可靠分布式系统-paxos的直观解释.pdf](https://blog.openacid.com/post-res/paxos/%E5%8F%AF%E9%9D%A0%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F-paxos%E7%9A%84%E7%9B%B4%E8%A7%82%E8%A7%A3%E9%87%8A.pdf)
 
+[Paxos made simple 论文导读](https://zhuanlan.zhihu.com/p/380587949)
+
+[知行学社——paxos和分布式系统](https://www.bilibili.com/video/BV1Lt411m7cW/)
+
 ## Multi Paxos
 
 [Implementing Replicated Logs with Paxos - Diego Ongaro](https://ongardie.net/static/raft/userstudy/paxos.pdf)
