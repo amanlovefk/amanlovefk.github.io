@@ -136,7 +136,7 @@ Multi Paxos Implementing Replicated Logs with Paxos - Diego Ongaro
 Paxos lecture (Raft user study)
 用paxos实现多副本日志系统&amp;ndash;basic paxos部分
 用paxos实现多副本日志系统&amp;ndash;multi paxos部分</content></entry><entry><title>一些Windows下小工具推荐</title><url>/post/third/</url><categories/><tags/><content type="html">第三篇，我想来聊一下windows10环境下的好用的小工具。
-Listary：文件搜索工具。速度非常快，搜索匹配度高。最近更新到 6.x 版本，界面升级了。双击 Ctrl 唤起。 uTools：应用启动工具。Alt + 空格键 唤起。再也不需要自己去桌面上找图标然后双击了。 WizTree：磁盘分析工具。分析非常快，以百分比的形式显示哪些文件夹和文件占用磁盘比例最大，让我们释放磁盘空间时有的放矢。 Sublime Text：文本编辑器。功能不是很强大，但是打开非常快。打字交互做得很好，适合作为普通文本编辑器。默认主题也很好看。 我最常用的就是这几个软件呢。东西不在多，也需要精，趁手即可。</content></entry><entry><title>Java 开发者的磁盘管理经验</title><url>/post/second/</url><categories/><tags/><content type="html">Hugo 有时候会有点问题，看不见 post.
+Listary：文件搜索工具。速度非常快，搜索匹配度高。最近更新到 6.x 版本，界面升级了。双击 Ctrl 唤起。 uTools：应用启动工具。Alt + 空格键 唤起。再也不需要自己去桌面上找图标然后双击了。 WizTree：磁盘分析工具。分析非常快，以百分比的形式显示哪些文件夹和文件占用磁盘比例最大，让我们释放磁盘空间时有的放矢。 Sublime Text：文本编辑器。功能不是很强大，但是打开非常快。打字交互做得很好，适合作为普通文本编辑器。默认主题也很好看。 Bandzip：非常好用的解压缩软件。 KeePass：密码管理软件。可以用来管理一些不太重要的密码。</content></entry><entry><title>Java 开发者的磁盘管理经验</title><url>/post/second/</url><categories/><tags/><content type="html">Hugo 有时候会有点问题，看不见 post.
 今天我想来聊聊 Java 开发者的一些电脑存储管理的经验。
 第一呢，是IDEA的 idea.properties 文件中的几个路径，比如插件存放的路径，索引的路径。这些都可以修改。如果使用默认配置的话，时间长了，C 盘很容易被占满。
 第二个呢，是关于 Maven 的本地仓库。也不要放在 C 盘。IDEA 每次打开新的工程师会使用自己默认的 Maven 配置，我们可以新建一个打开项目的模板，在里面配置自己的Maven仓库位置和配置。
