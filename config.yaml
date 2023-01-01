@@ -168,9 +168,9 @@ params:
 
   # 页面模式
   # Schemes
-  #scheme: Muse
-  #scheme: Mist
-  #scheme: Pisces
+#  scheme: Muse
+#  scheme: Mist
+#  scheme: Pisces
   scheme: Gemini
 
   # 开启暗模式

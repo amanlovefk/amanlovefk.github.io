@@ -16,6 +16,8 @@ draft: false
 
 [知行学社——paxos和分布式系统](https://www.bilibili.com/video/BV1Lt411m7cW/)
 
+[Understanding Paxos](https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html)
+
 ## Multi Paxos
 
 [Implementing Replicated Logs with Paxos - Diego Ongaro](https://ongardie.net/static/raft/userstudy/paxos.pdf)
