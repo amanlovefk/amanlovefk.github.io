@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><search><entry><title>理解Paxos算法的几种建模方法</title><url>/post/20221229_01/</url><categories/><tags/><content type="html">从并发编程锁的角度 Paxos made simple 论文导读
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><search><entry><title>完美是一个结果</title><url>/post/20230101_01/</url><categories/><tags/><content type="html">完美是一个结果，如果一开始就奔着完美去，那可能永远无法开始。
+尽早开始，慢慢迭代，慢慢打磨。如果最终结局没有那么好，也好过从未开始过。
+在路上，那风景才会变化。而到达，有那么重要吗？</content></entry><entry><title>理解Paxos算法的几种建模方法</title><url>/post/20221229_01/</url><categories/><tags/><content type="html">从并发编程锁的角度 Paxos made simple 论文导读
 两阶段是先加锁再操作的过程； 引入编号是抢占锁的设计 多数派是为了获取集群的锁（鸽笼原理） 选择最大编号的提案是为了快速收敛 从多数派写的角度 可靠分布式系统-paxos的直观解释
 Request promise before write 从原论文的角度 从零开始推导，不断加强约束，最后得到完整的算法过程。
 https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html</content></entry><entry><title>Understanding Paxos</title><url>/post/understanding_paxos/</url><categories/><tags/><content type="html"> https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html
@@ -132,6 +134,7 @@ proposer 要求 acceptor 不在接受任意编号小于 n 的提案。这样就�
 可靠分布式系统-paxos的直观解释.pdf
 Paxos made simple 论文导读
 知行学社——paxos和分布式系统
+Understanding Paxos
 Multi Paxos Implementing Replicated Logs with Paxos - Diego Ongaro
 Paxos lecture (Raft user study)
 用paxos实现多副本日志系统&amp;ndash;basic paxos部分
