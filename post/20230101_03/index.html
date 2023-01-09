@@ -1,0 +1,586 @@
+<!doctype html><html lang=zh-cn data-theme=dark>
+<head><meta charset=utf-8>
+<meta name=viewport content="width=device-width">
+<meta name=theme-color content="#222" media="(prefers-color-scheme: dark)">
+<meta name=generator content="Hugo 0.91.2">
+<link rel="shortcut icon" type=image/x-icon href=/imgs/icons/favicon.ico>
+<link rel=icon type=image/x-icon href=/imgs/icons/favicon.ico>
+<link rel=icon type=image/png sizes=16x16 href=/imgs/icons/favicon_16x16_next.png>
+<link rel=icon type=image/png sizes=32x32 href=/imgs/icons/favicon_32_32_next.png>
+<link rel=apple-touch-icon sizes=180x180 href=/imgs/icons/apple_touch_icon_next.png>
+<meta itemprop=name content="Paxos 共识算法（第二次尝试）">
+<meta itemprop=description content="雨水落进大海">
+<meta itemprop=datePublished zgotmplz>
+<meta itemprop=dateModified zgotmplz>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=keywords content="Hugo,NexT,主题,简单,强大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paxos 共识算法（第二次尝试）">
+<meta property="og:description" content="雨水落进大海">
+<meta property="og:image" content="/imgs/hugo_next_avatar.png">
+<meta property="og:image:width" content="312">
+<meta property="og:image:height" content="312">
+<meta property="og:image:type" content="image/jpeg/png/svg/jpg">
+<meta property="og:url" content="/post/20230101_03/">
+<meta property="og:site_name" content="白夜的博客">
+<meta property="og:locale" content="zh-CN">
+<meta property="article:author" content="白夜">
+<meta property="article:published_time" content="2023-01-01 19:11:44 +0800 +0800">
+<meta property="article:modified_time" content="2023-01-01 19:11:44 +0800 +0800">
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/font-awesome/6.1.2/css/all.min.css>
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/animate.css/3.1.1/animate.min.css>
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.css>
+<link rel=stylesheet href=/css/main.min.b6b7c64c91f406436dfb5af5fb824afde0a9bff3df38791c85e603b522e49a2e.css>
+<style type=text/css>.post-footer,.flinks-list-footer hr:after{content:"~ 我可是有底线的哟 ~"}</style>
+<script type=text/javascript>(function(){localDB={set:function(b,c,a){if(a===0)return;const d=new Date,e=a*864e5,f={value:c,expiry:d.getTime()+e};localStorage.setItem(b,JSON.stringify(f))},get:function(a){const b=localStorage.getItem(a);if(!b)return void 0;const c=JSON.parse(b),d=new Date;return d.getTime()>c.expiry?(localStorage.removeItem(a),void 0):c.value}},theme={active:function(){const a=localDB.get('theme');if(a==void 0)return;theme.toggle(a),window.matchMedia("(prefers-color-scheme: dark)").addListener(function(a){theme.toggle(a.matches?'dark':'light')})},toggle:function(a){document.documentElement.setAttribute('data-theme',a),localDB.set('theme',a,2);const b=document.querySelector('iframe.giscus-frame');if(b){const c={setConfig:{theme:a}};b.contentWindow.postMessage({giscus:c},'https://giscus.app')}}},theme.active()})(window)</script>
+<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"path":"20230101_03","permalink":"/post/20230101_03/","title":"Paxos 共识算法（第二次尝试）","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
+<script type=text/javascript>document.addEventListener('DOMContentLoaded',()=>{var a=document.createElement('script');a.charset="UTF-8",a.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js",a.async=!1,a.defer=!0,document.head.appendChild(a),a.onload=function(){NexT.utils.fmtBusuanzi()}})</script>
+<title>Paxos 共识算法（第二次尝试） - 白夜的博客</title>
+<noscript>
+<link rel=stylesheet href=/css/noscript.css>
+</noscript>
+</head>
+<body itemscope itemtype=http://schema.org/WebPage>
+<div class=headband></div>
+<main class=main>
+<header class=header itemscope itemtype=http://schema.org/WPHeader>
+<div class=header-inner>
+<div class=site-brand-container>
+<div class=site-nav-toggle>
+<div class=toggle aria-label=切换导航栏 role=button>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+</div>
+</div>
+<div class=site-meta>
+<a href=/ class=brand rel=start>
+<i class=logo-line></i>
+<h1 class=site-title>白夜的博客</h1>
+<i class=logo-line></i>
+</a>
+<p class=site-subtitle itemprop=description>白夜的博客</p>
+</div>
+<div class=site-nav-right>
+<div class="toggle popup-trigger">
+<i class="fa fa-search fa-fw fa-lg"></i>
+</div>
+</div>
+</div>
+<nav class=site-nav>
+<ul class="main-menu menu">
+<li class="menu-item menu-item-home">
+<a href=/ class=hvr-icon-pulse rel=section><i class="fa fa-home hvr-icon"></i>首页
+</a>
+</li>
+<li class="menu-item menu-item-about">
+<a href=/about/ class=hvr-icon-pulse rel=section><i class="fa fa-user hvr-icon"></i>关于
+</a>
+</li>
+<li class="menu-item menu-item-archives">
+<a href=/archives/ class=hvr-icon-pulse rel=section><i class="fa fa-archive hvr-icon"></i>归档
+<span class=badge>10</span>
+</a>
+</li>
+<li class="menu-item menu-item-search">
+<a role=button class="popup-trigger hvr-icon-pulse"><i class="fa fa-search fa-fw hvr-icon"></i>搜索
+</a>
+</li>
+</ul>
+</nav>
+<div class=search-pop-overlay>
+<div class="popup search-popup">
+<div class=search-header>
+<span class=search-icon>
+<i class="fa fa-search"></i>
+</span>
+<div class=search-input-container>
+<input autocomplete=off autocapitalize=off maxlength=80 placeholder=搜索... spellcheck=false type=search class=search-input>
+</div>
+<span class=popup-btn-close role=button>
+<i class="fa fa-times-circle"></i>
+</span>
+</div>
+<div class="search-result-container no-result">
+<div class=search-result-icon>
+<i class="fa fa-spinner fa-pulse fa-5x"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toggle sidebar-toggle" role=button>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+</div>
+<aside class=sidebar>
+<div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+<ul class=sidebar-nav>
+<li class=sidebar-nav-toc>
+文章目录
+</li>
+<li class=sidebar-nav-overview>
+站点概览
+</li>
+</ul>
+<div class=sidebar-panel-container>
+<div class="post-toc-wrap sidebar-panel">
+<div class="post-toc animated"><nav id=TableOfContents>
+<ul>
+<li><a href=#共识问题>共识问题</a>
+<ul>
+<li><a href=#共识算法应用案例>共识算法应用案例</a>
+<ul>
+<li><a href=#etcd>Etcd</a></li>
+<li><a href=#微信-phxpaxos>微信 PhxPaxos</a></li>
+<li><a href=#oceanbase>OceanBase</a></li>
+<li><a href=#apache-kafka-使用-kraft-替换-zookeeper>Apache Kafka 使用 KRaft 替换 ZooKeeper</a></li>
+</ul>
+</li>
+<li><a href=#故障模型>故障模型</a></li>
+<li><a href=#安全性要求>安全性要求</a></li>
+<li><a href=#活性要求>活性要求</a></li>
+</ul>
+</li>
+<li><a href=#paxos-算法>Paxos 算法</a>
+<ul>
+<li><a href=#基本组件>基本组件</a></li>
+<li><a href=#单个-acceptor>单个 acceptor</a></li>
+<li><a href=#多个-acceptor>多个 acceptor</a></li>
+<li><a href=#paxos-算法流程>Paxos 算法流程</a></li>
+</ul>
+</li>
+<li><a href=#paxos算法应对冲突的案例>Paxos算法应对冲突的案例</a>
+<ul>
+<li><a href=#已经有值被选中>已经有值被选中</a></li>
+<li><a href=#原先的值尚未被选中>原先的值尚未被选中</a>
+<ul>
+<li><a href=#新的-proposer-能看到原先的值>新的 proposer 能看到原先的值</a></li>
+<li><a href=#新的-proposer-未看到原先的值>新的 proposer 未看到原先的值</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href=#paxos算法应对崩溃的场景>Paxos算法应对崩溃的场景</a>
+<ul>
+<li><a href=#acceptor-在-prepare-阶段崩溃>acceptor 在 prepare 阶段崩溃</a></li>
+<li><a href=#acceptor-在-accept-阶段崩溃>acceptor 在 accept 阶段崩溃</a></li>
+<li><a href=#proposer-在-prepare-阶段崩溃>proposer 在 prepare 阶段崩溃</a></li>
+</ul>
+</li>
+<li><a href=#其他>其他</a>
+<ul>
+<li><a href=#如何读取到达成共识的值>如何读取到达成共识的值</a></li>
+<li><a href=#活性保证>活性保证</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="site-overview-wrap sidebar-panel">
+<div class="site-author site-overview-item animated" itemprop=author itemscope itemtype=http://schema.org/Person>
+<img class=site-author-image itemprop=image alt=白夜 src=/imgs/img-lazy-loading.gif data-src=/imgs/hugo_next_avatar.png>
+<p class=site-author-name itemprop=name>白夜</p>
+<div class=site-description itemprop=description>雨水落进大海</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+<nav class=site-state>
+<div class="site-state-item site-state-posts">
+<a href=/archives/>
+<span class=site-state-item-count>10</span>
+<span class=site-state-item-name>日志</span>
+</a>
+</div>
+<div class="site-state-item site-state-categories">
+<a href=/categories/>
+<span class=site-state-item-count>0</span>
+<span class=site-state-item-name>分类</span>
+</a>
+</div>
+<div class="site-state-item site-state-tags">
+<a href=/tags/>
+<span class=site-state-item-count>0</span>
+<span class=site-state-item-name>标签</span>
+</a>
+</div>
+</nav>
+</div>
+<div class="links-of-social site-overview-item animated">
+</div>
+<div class="cc-license animated" itemprop=license>
+<a href=https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh class=cc-opacity rel=noopener target=_blank title=共享知识>
+<img src=/imgs/img-lazy-loading.gif data-src=/imgs/cc/big/by_nc_sa.svg alt=共享知识>
+</a>
+</div>
+<div class="links-of-blogroll site-overview-item animated">
+<div class=links-of-blogroll-title>
+<i class="fa fa-globe fa-fw"></i>友情链接
+</div>
+<ul class=links-of-blogroll-list>
+<li class=links-of-blogroll-item>
+<a href=https://gitee.com/hugo-next/hugo-theme-next title=https://gitee.com/hugo-next/hugo-theme-next target=_blank>Hugo-NexT</a>
+</li>
+<li class=links-of-blogroll-item>
+<a href=https://lisenhui.cn title=https://lisenhui.cn target=_blank>凡梦星尘空间站</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id=siteinfo-card-widget class=sidebar-card-widget>
+<div class=item-headline>
+<i class="fas fa-chart-line"></i>
+<span>网站资讯</span>
+</div>
+<div class=siteinfo>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa-solid fa-calendar-check"></i>已运行：</div>
+<div class=item-count id=runTimes data-publishdate=2022-12-19T13:36:20+08:00></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name>
+<i class="fas fa fa-user"></i>总访客数：
+</div>
+<div class=item-count id=busuanzi_value_site_uv><i class="fa fa-sync fa-spin"></i></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name>
+<i class="fas fa fa-eye"></i>页面浏览：
+</div>
+<div class=item-count id=busuanzi_value_site_pv><i class="fa fa-sync fa-spin"></i></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-font"></i>总字数：</div>
+<div class=item-count id=wordsCount data-count=20354></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-mug-hot"></i>阅读约：</div>
+<div class=item-count id=readTimes data-times=46></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-clock-rotate-left"></i>最后更新于：</div>
+<div class=item-count id=last-push-date data-lastpushdate=2023-01-09T15:43:43+08:00></div>
+</div>
+</div>
+</div>
+</aside>
+<div class=sidebar-dimmer></div>
+</header>
+<div class=tool-buttons>
+<div id=toggle-theme class=button title=深浅模式切换>
+<i class="fas fa-adjust"></i>
+</div>
+<div class=back-to-top role=button title=返回顶部>
+<i class="fa fa-arrow-up"></i>
+<span>0%</span>
+</div>
+</div>
+<div class=reading-progress-bar></div>
+<a role=button class="book-mark-link book-mark-link-fixed"></a>
+<noscript>
+<div class=noscript-warning>Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="main-inner post posts-expand">
+<div class=post-block>
+<article itemscope itemtype=http://schema.org/Article class=post-content lang>
+<link itemprop=mainEntityOfPage href=/post/20230101_03/>
+<span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=name content="白夜">
+</span>
+<span hidden itemprop=publisher itemscope itemtype=http://schema.org/Organization>
+<meta itemprop=name content="白夜">
+<meta itemprop=description content="雨水落进大海">
+</span>
+<span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
+<meta itemprop=name content="Paxos 共识算法（第二次尝试）">
+<meta itemprop=description content="共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只">
+</span>
+<header class=post-header>
+<h1 class=post-title itemprop="name headline">Paxos 共识算法（第二次尝试） </h1>
+<div class=post-meta-container>
+<div class=post-meta-items>
+<span class=post-meta-item>
+<span class=post-meta-item-icon>
+<i class="far fa-calendar"></i>
+</span>
+<span class=post-meta-item-text>发表于：</span>
+<time title="发表于：2023-01-01 19:11:44 +0800 +0800" itemprop="dateCreated datePublished" datetime="2023-01-01 19:11:44 +0800 +0800">2023-01-01</time>
+</span>
+</div>
+<div class=post-meta-items>
+<span class=post-meta-item title=字数>
+<span class=post-meta-item-icon>
+<i class="far fa-file-word"></i>
+</span>
+<span class=post-meta-item-text>字数：</span><span>4123</span>
+</span>
+<span class=post-meta-item title=阅读>
+<span class=post-meta-item-icon>
+<i class="far fa-clock"></i>
+</span>
+<span class=post-meta-item-text>阅读：&ap;</span>
+<span>9分钟</span>
+</span>
+<span class=post-meta-item title=浏览>
+<span class=post-meta-item-icon>
+<i class="far fa-eye"></i>
+</span>
+<span class=post-meta-item-text>
+浏览：
+</span>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/20230101_03/>
+<i class="fa fa-sync fa-spin"></i>
+</span>
+</span>
+</div>
+</div>
+</header>
+<div class="post-body autonumber" itemprop=articleBody>
+<h2 id=共识问题>共识问题</h2>
+<p>对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只有一个能被选中（chosen）。
+如果没有提议，那么就不会有值被选中。如果一个值被选中之后，进程能够学习到（learn）这个被选中的值。</p>
+<p>经典的共识算法主要有 Paxos 和 Raft。今天我们介绍 Paxos 算法。</p>
+<h3 id=共识算法应用案例>共识算法应用案例</h3>
+<h4 id=etcd>Etcd</h4>
+<p>Etcd 是 CoreOS 基于 Raft 协议开发的分布式键值对存储 (key-value peer store) ，设计用来可靠而快速的保存关键数据并提供访问。</p>
+<p>etcd 可用于：</p>
+<ul>
+<li>共享配置</li>
+<li>服务发现</li>
+<li>分布式锁或一致性保障</li>
+<li>分布式数据队列</li>
+<li>分布式通知和协调</li>
+<li>集群选举</li>
+</ul>
+<h4 id=微信-phxpaxos>微信 PhxPaxos</h4>
+<blockquote>
+<p>PhxPaxos是腾讯公司微信后台团队自主研发的一套基于Paxos协议的多机状态拷贝类库。
+它以库函数的方式嵌入到开发者的代码当中， 使得一些单机状态服务可以扩展到多机器，从而获得强一致性的多副本以及自动容灾的特性。
+这个类库在微信服务里面经过一系列的工程验证，并且我们对它进行过大量的恶劣环境下的测试，使其在一致性的保证上更为健壮。</p>
+</blockquote>
+<h4 id=oceanbase>OceanBase</h4>
+<blockquote>
+<p>OceanBase 数据库使用 Paxos 的优化 Multi-Paxos 实现多副本数据同步以及集群的高可用。</p>
+</blockquote>
+<h4 id=apache-kafka-使用-kraft-替换-zookeeper>Apache Kafka 使用 KRaft 替换 ZooKeeper</h4>
+<p>
+<a href=https://www.infoq.com/news/2022/10/apache-kafka-kraft/ title="Apache Kafka 3.3 Replaces ZooKeeper with the New KRaft Consensus Protocol" rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+Apache Kafka 3.3 Replaces ZooKeeper with the New KRaft Consensus Protocol
+<i class="fa fa-external-link-alt"></i>
+</a></p>
+<blockquote>
+<p>KRaft is the consensus protocol developed to allow metadata management directly in Apache Kafka.
+This greatly simplifies Kafka’s architecture by consolidating responsibility for metadata into Kafka
+itself without the requirement of a third-party tool like Apache ZooKeeper.</p>
+</blockquote>
+<p><img src=/imgs/img-lazy-loading.gif data-src=https://images.contentful.com/gt6dp23g0g38/5ssqb8kUN6Lq5lR1EZdCX1/2a28415f8718dfec9edc345d9914dfec/new-quorum-controller-1536x817.png alt></p>
+<p>Apache Kafka 替换 ZooKeeper 为 自身实现的 KRaft 协议用于元数据的管理。</p>
+<h3 id=故障模型>故障模型</h3>
+<p>我们假设进程之间通过消息进行通信，并使用异步的、非拜占庭式的故障模型：</p>
+<ul>
+<li>
+<p>进程可能会以任意的速度运行，可能会崩溃，可能会重启。值别选中之后然后进程重启了，这种情况完全有可能，所以共识算法必须要采取持久化存储来保证进程
+崩溃和重启之后仍然能够记住某些决策信息。</p>
+</li>
+<li>
+<p>进程发送的消息送达的耗时是不确定的，可能会花费非常长的时间，可能会重复、丢失， 但是绝不会被篡改（非拜占庭）。</p>
+</li>
+</ul>
+<h3 id=安全性要求>安全性要求</h3>
+<p>共识算法的安全性要求如下：</p>
+<ul>
+<li>提议中的值才能被选中</li>
+<li>只有一个值能被选中</li>
+<li>只有被选中的值被确定下来之后，进程才能学习到这个值</li>
+</ul>
+<h3 id=活性要求>活性要求</h3>
+<p>只要超过半数的server能正常工作，并且消息也能在合理的延时范围内达到，那么系统就能够正常工作，得出正常的结果。正常工作包含两个方面：</p>
+<ul>
+<li>总是确定最终选定一个值，而不是一直处于一个没有值被选中的状态中。</li>
+<li>如果一个值被选中（chosen），那么其他的server最终必然能够得知这个值。</li>
+</ul>
+<h2 id=paxos-算法>Paxos 算法</h2>
+<h3 id=基本组件>基本组件</h3>
+<p>Paxos 算法中需要两个组件相互配合：提议者（proposer）和 接受者（acceptor）。</p>
+<ul>
+<li>提议者（proposers）：系统的主动部分，接收客户端的请求，根据请求向其他的server提议特定的值，尝试让其他server接受并最终选定这个值。</li>
+<li>接受者（acceptors）：系统的被动部分，接收提议者的请求并做出响应。响应的结果可以看成一次投票，表示接受者是否接收提议者的提议。</li>
+</ul>
+<p>下面我们简单推导一下Paxos算法的流程。</p>
+<h3 id=单个-acceptor>单个 acceptor</h3>
+<p>只有一个 acceptor 来处理所有的提议。当不同的提议提交之后，acceptor 从中选择一个值作为选定值。但是，这个唯一的 acceptor 挂掉之后，我们就
+无法得知选中的值了。</p>
+<h3 id=多个-acceptor>多个 acceptor</h3>
+<p>为了解决acceptor单点故障的问题，我们采用多个 acceptor，并采用朴素的少数服务多数的原则，如果一个提议被多数acceptor接受之后，就认为是被选定了。
+这样的话，如果一个 acceptor 宕机了，剩下的acceptor仍然能告诉我们被选定的值是什么。</p>
+<p>那么acceptor采用怎样的策略接受提议呢？我们不妨使用最简单方案：接受它收到的第一个提议。</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/babd2fc566d6cab2578248740b88b8e3/image.png alt=image></p>
+<p>但是这样可能发生如图所示的分裂的情况，没有任何值被过半的acceptor所接受，没有任何中被选中，违反了算法的安全性要求。</p>
+<p>如果acceptor可以改变自己的想法，接受多个不同的值呢？</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/b4ebbbd4770e1c1a7e51b7eaad97a7f6/image.png alt=image></p>
+<p>不幸的是，此时可能产生多个被选中的值。</p>
+<p>这个问题的解决方案是：proposer 在提议之前，如果发现一个值已经被选定，那么必须抛弃自己的提议，只能提议被选定的值。所以 s5 在提议之前，需要先
+确定是否已经有其他值被选中。所以在正式提案之前先进行一次查询，这个方案就是二阶段协议 (2-phase protocol).</p>
+<p>两阶段协议仍然不足以解决一些问题场景。</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/ea74bf5bed13f579e55347d47f593ba3/image.png alt=image></p>
+<p>如图，S1 和 S5 经过查询之后碰巧都发现 acceptor 没有选定的值，所以发出自己的提议。于是，又出现两个值被选中的情况。</p>
+<p>这个问题的解决方案是：一旦我们<strong>选定</strong>了一个值，其他的不同的提议应该被 acceptor 拒绝并最终被整个系统淘汰掉。在这个例子中，s3 已经先接受了
+s5 的提议，需要以某种方式拒绝掉 s1 的提议。</p>
+<p>为了达到这个目的，我们给所有的提议附加一个编号，对他们进行排序。如果 acceptor 已经接受了更新的提议，那么根据编号大小需要拒绝掉更老（更小编号）
+的提议。</p>
+<p>也就是：</p>
+<ol>
+<li>我们需要二阶段协议，在正式提议之前，先检查是否有其他值被选中，如果有，就抛弃掉自己的值，改选已经选定的值。</li>
+<li>所以的提议要有序。如果acceptor已经接受了新的提议，就应该拒绝掉老的提议。</li>
+</ol>
+<h3 id=paxos-算法流程>Paxos 算法流程</h3>
+<p>Paxos 算法分为两个阶段，分别叫做 Prepare 阶段和 Accept 阶段。</p>
+<p>Prepare 阶段：proposer 尝试提议时，先广播 prepare 请求，到达两个目的：</p>
+<ul>
+<li>找到已经被选定的值</li>
+<li>阻塞掉还没有完成的旧的提议</li>
+</ul>
+<p>Accept 阶段：proposer 广播 accept 请求，让系统接收一个特定的值，如果有过半的acceptor回复接受，那么就确定这个提议被选中了。</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/69bcc9640bc49e882819e8e244fbf1b0/image.png alt=image></p>
+<p>我们来详解解释一下这张图。</p>
+<p>proposer 想要提议某个值时，首先要生成一个提案编号 n，这个编号必须没有使用过，而且比当前proposer以往使用的编号都大。</p>
+<p>首先我们进入 prepare 阶段。在此阶段，我们的prepare请求中只有一个编号 n。当acceptor 接收到 prepare 请求时，做两件事情：</p>
+<ol>
+<li>承诺不会接受比 n 编号还小的提议。为此，acceptor 保存一个 minProposal 值，表示 acceptor 第二阶段能够接收的值的提议编号必须大于等于它。
+acceptor 同时检查n是否大于 minProposal，如果是，则更新 minProposal = n.</li>
+<li>如果之前已经接受了一个提议，需要将其作为prepare请求的响应返回给proposer。因此，acceptor 必须记录下该提案的编号和值，分别为
+acceptedValue 和 acceptedProposal。</li>
+</ol>
+<p>Proposer 发出prepare请求之后，等待acceptor响应，至少有过半的acceptor响应之后，才能进入第二阶段。如果acceptor收到的响应中包含接受的提案，
+它将从中选择一个编号最大的提案的值作为自己的提案的值，否则使用自己的值。</p>
+<p>proposer 进入第二阶段后，发出的 acceptor 请求中携带两个中，编号和提案的值，编号就是 prepare 请求中的编号。</p>
+<p>acceptor 接收到 Prepare 请求后，比较编号与 minProposal 的值，如果大于等于它，则更新 minProposal的值为n，并且替换自己 acceptedValue
+为请求中的值。如果小于则直接拒绝。不管acceptor是接受还是拒绝这个提议，acceptor都会返回自己的minProposal值给proposer。</p>
+<p>proposer在发送完accept请求后，就等待acceptor的响应。直到过半数的acceptor响应之后，proposer才能决定下一步做什么。
+如果proposer收到的响应中有拒绝（rejection），那proposer就放弃此轮paxos，回到第一步重新再来。
+如果proposer收到了过半数的acceptor的接受(accept)，那么proposer就可以确定，自己提交的值被选定了。
+proposer通过比较acceptor返回的结果值（即acceptor的minProposal值）来确定自己到底是被拒绝还是被接受了：
+如果结果值大于自己prepare时的提议号，那自己就是被拒绝了；否则，自己就是被接受了。</p>
+<h2 id=paxos算法应对冲突的案例>Paxos算法应对冲突的案例</h2>
+<p>不同 proposer 的 prepare 请求和 accept 请求之间是高度并行化的，所以不同提议之间会发生很多竞争。</p>
+<p>我们来看一下basic paxos在几种特定的竞争状态下，怎么保证正常工作的。</p>
+<p>需要明确的一点是，如果 paxos 能够因为竞争而出问题，关键的时间点就发生在 proposer 第二次发出 prepare 请求的时刻。为什么是第二次呢？
+如果第二次prepare都没有，哪来竞争呢？如果第二次prepare时能顺利被解决，那第三次prepare的发出应该可以类推，又变成了第二次 prepare 请求。
+我们知道所有的提议都是被按顺序编号的，所以我们要关注的就是编号较大的那次prepare。</p>
+<h3 id=已经有值被选中>已经有值被选中</h3>
+<p>这里的图示显示的是acceptor的视角，P 3.1 表示这是一个编号为 3.1 的 Prepare 请求；A 3.1 X 表示这是一个编号为 3.1，值为 X 的 accept 请求。</p>
+<p>图中S1 和 S5 先后发出了提议。</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/de36f0a9f056c7c7da6c57947aaf0ff1/image.png alt=image></p>
+<p>S1, S2, S3 已经就 X 达成了共识；S5 在向 S3, S4, S5 发送 prepare 的第一阶段中，获取到 X 的提议，于是放弃自己的值，该用 X，于是原先由
+3个acceptor接受的值现在被巩固到被所有acceptor接受。</p>
+<h3 id=原先的值尚未被选中>原先的值尚未被选中</h3>
+<p>这里分为两种情况：</p>
+<h4 id=新的-proposer-能看到原先的值>新的 proposer 能看到原先的值</h4>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/40c709ebcce9332b0948d4149773490e/image.png alt=image></p>
+<p>与第一种情况类似，S5 在prepare阶段发现 X 的存在，并使用 X 作为自己的提案的值。</p>
+<h4 id=新的-proposer-未看到原先的值>新的 proposer 未看到原先的值</h4>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/c55839c8ca176c38a4c74d0905efe333/image.png alt=image></p>
+<p>S5 将使用它自己的值，原先旧的提议将被终止。S1 向 S3 发出的 accept 请求由于编号小于 4.5 而被拒绝。S5 提议的值被选中。</p>
+<h2 id=paxos算法应对崩溃的场景>Paxos算法应对崩溃的场景</h2>
+<h3 id=acceptor-在-prepare-阶段崩溃>acceptor 在 prepare 阶段崩溃</h3>
+<p>只要超过半数的acceptor仍可以正常响应，算法仍然能正常继续下去。</p>
+<h3 id=acceptor-在-accept-阶段崩溃>acceptor 在 accept 阶段崩溃</h3>
+<p>只要超过板书的acceptor仍然能正常响应，算法仍然能正常继续下去。</p>
+<h3 id=proposer-在-prepare-阶段崩溃>proposer 在 prepare 阶段崩溃</h3>
+<p>如果 proposer 在发出任何消息前崩溃，那么就和它从未运行过效果是一样的。</p>
+<p>如果它已经发出了一些 prepare 请求，某些 acceptor 会发回响应，然而没有后续的 accept 请求。不过其他的节点也在继续Paxos算法，并使用更大
+的编号来废弃掉失败的提议；如果编号没有超过它的话，那么只能自己选择一个更大的编号来阻塞掉之前的旧的提议。</p>
+<p>如果 proposer 在 accept 阶段失败，但是至少被一个acceptor接受了。那么后续proposer在prepare请求的响应中可能会发现这个提议，将其作为自己的
+提议的值，帮助前者完成终止的Paxos过程。</p>
+<h2 id=其他>其他</h2>
+<h3 id=如何读取到达成共识的值>如何读取到达成共识的值</h3>
+<p>运行一轮 Paxos 算法过程</p>
+<h3 id=活性保证>活性保证</h3>
+<p>Paxos 可能会形成活锁，如图：</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/cb7fc358ae6301088895eb6ea30422c4/image.png alt=image></p>
+<p>解决办法有两个：</p>
+<ol>
+<li>proposer 如果发现自己的提议被拒绝，那表明有其他proposer也在想设定这个值，那么就随机地等待一段时间，
+让另一个 proposer 可以有更大的机会来完成整个流程，最终把这个值确定下来</li>
+<li>从 proposer 中选出一个 leader，确保一个时间段内，只有一个 proposer，避免活锁的发生。</li>
+</ol>
+<p>参考：</p>
+<p>[1]
+<a href=https://cloud.tencent.com/developer/article/1147420 title="用paxos实现多副本日志系统&amp;ndash;basic paxos部分" rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+用paxos实现多副本日志系统&ndash;basic paxos部分
+<i class="fa fa-external-link-alt"></i>
+</a></p>
+<p>[2]
+<a href=https://ongardie.net/static/raft/userstudy/paxos.pdf title="Implementing Replicated Logs with Paxos - Diego Ongaro" rel="noopener external nofollow noreferrer" target=_blank class=exturl>
+Implementing Replicated Logs with Paxos - Diego Ongaro
+<i class="fa fa-external-link-alt"></i>
+</a></p>
+</div>
+<footer class=post-footer>
+<div class=addthis_inline_share_toolbox style=text-align:center></div>
+<hr>
+<div class=post-copyright>
+<img src=/imgs/cc/cc.svg width=75 height=75 align=right>
+<ul>
+<li class=post-copyright-title>
+<strong>文章标题：</strong>
+Paxos 共识算法（第二次尝试）
+</li>
+<li class=post-copyright-author>
+<strong>本文作者： </strong>
+白夜
+</li>
+<li class=post-copyright-link>
+<strong>本文链接：</strong>
+<a id=post-cr-link href=/post/20230101_03/ title="Paxos 共识算法（第二次尝试）">/post/20230101_03/</a>
+</li>
+<li class=post-copyright-license>
+<strong>版权声明： </strong>
+本博客所有文章除特别声明外，均采用 <i class="fab fa-fw fa-creative-commons"></i><a target=_blank href=https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh>BY-NC-SA</a> 许可协议。转载请注明出处！
+</li>
+</ul>
+</div>
+<div class=post-nav>
+<div class="post-nav-next post-nav-item">
+<a href=/post/linux_space_extend/ rel=next title="Ubuntu 22 虚拟机扩容">
+<i class="fa fa-chevron-left"></i> Ubuntu 22 虚拟机扩容
+</a>
+</div>
+<div class="post-nav-prev post-nav-item">
+<a href=/post/20230101_02/ rel=prev title="Paxos 共识算法（第一次尝试）">
+Paxos 共识算法（第一次尝试）
+<i class="fa fa-chevron-right"></i>
+</a>
+</div>
+</div>
+</footer>
+</article>
+</div>
+</div>
+</main>
+<footer class=footer>
+<div class=footer-inner>
+<div class=copyright>
+&copy;
+<span itemprop=copyrightYear>
+2010 - 2023
+</span>
+<span class=with-love>
+<i class="fa fa-heart"></i>
+</span>
+<span class=author itemprop=copyrightHolder>白夜</span>
+</div>
+<div class=powered-by>
+由 <a href=https://gohugo.io title=0.91.2 target=_blank>Hugo</a> & <a href=https://github.com/hugo-next/hugo-theme-next title=4.4.1 target=_blank>Hugo NexT.Gemini</a> 强力驱动
+</div>
+</div>
+</footer>
+<script type=text/javascript src=https://cdn.staticfile.org/animejs/3.2.1/anime.min.js defer></script>
+<script type=text/javascript src=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.js defer></script>
+<script class=next-config data-name=main type=application/json>{"bookmark":{"color":"#222","enable":true,"save":"manual"},"busuanzi":{"pageview":true},"copybtn":true,"darkmode":true,"giscus":{"cfg":{"category":"Comments","categoryid":null,"emit":false,"inputposition":"top","mapping":"title","reactions":false,"repo":"username/repo-name","repoid":null,"theme":"preferred_color_scheme"},"js":"https://giscus.app/client.js"},"hostname":"/","i18n":{"ds_day":" 天前","ds_days":" 天 ","ds_hour":" 小时前","ds_hours":" 小时 ","ds_just":"刚刚","ds_min":" 分钟前","ds_mins":" 分钟","ds_month":" 个月前","ds_years":" 年 ","empty":"没有找到任何搜索结果：${query}","hits":"","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","placeholder":"搜索..."},"lang":"zh-CN","lazyload":false,"localSearch":{"enable":true,"path":"/searchindexes.xml","preload":false,"topnperarticle":-1,"trigger":"auto","unescape":false},"motion":{"async":true,"enable":false,"transition":{"collheader":"fadeInLeft","postblock":"fadeIn","postbody":"fadeInDown","postheader":"fadeInDown","sidebar":"fadeInUp"}},"root":"/","scheme":"Gemini","sidebar":{"display":"post","offset":12,"padding":18,"position":"left","width":256},"statis":{"enable":true,"plugin":"busuanzi"},"vendor":{"plugins":"qiniu","router":"https://cdn.staticfile.org"},"version":"4.4.1","waline":{"cfg":{"comment":true,"emoji":false,"imguploader":false,"pageview":true,"placeholder":"请文明发言哟 ヾ(≧▽≦*)o","reaction":true,"reactiontext":["点赞","踩一下","得意","不屑","尴尬","睡觉"],"reactiontitle":"你认为这篇文章怎么样？","requiredmeta":["nick","mail"],"serverurl":null,"sofa":"快来发表你的意见吧 (≧∀≦)ゞ","wordlimit":200},"css":{"alias":"waline","file":"dist/waline.css","name":"@waline/client","version":"2.13.0"},"js":{"alias":"waline","file":"dist/waline.js","name":"@waline/client","version":"2.13.0"}}}</script>
+<script type=text/javascript src=/js/main.min.44f22194cdbaf801583669f62e9338396a1209e5770f9210e5450ba9b6f498b2.js defer></script>
+</body>
+</html>

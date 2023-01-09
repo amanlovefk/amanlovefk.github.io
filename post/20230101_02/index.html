@@ -1,0 +1,476 @@
+<!doctype html><html lang=zh-cn data-theme=dark>
+<head><meta charset=utf-8>
+<meta name=viewport content="width=device-width">
+<meta name=theme-color content="#222" media="(prefers-color-scheme: dark)">
+<meta name=generator content="Hugo 0.91.2">
+<link rel="shortcut icon" type=image/x-icon href=/imgs/icons/favicon.ico>
+<link rel=icon type=image/x-icon href=/imgs/icons/favicon.ico>
+<link rel=icon type=image/png sizes=16x16 href=/imgs/icons/favicon_16x16_next.png>
+<link rel=icon type=image/png sizes=32x32 href=/imgs/icons/favicon_32_32_next.png>
+<link rel=apple-touch-icon sizes=180x180 href=/imgs/icons/apple_touch_icon_next.png>
+<meta itemprop=name content="Paxos 共识算法（第一次尝试）">
+<meta itemprop=description content="雨水落进大海">
+<meta itemprop=datePublished zgotmplz>
+<meta itemprop=dateModified zgotmplz>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=keywords content="Hugo,NexT,主题,简单,强大">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Paxos 共识算法（第一次尝试）">
+<meta property="og:description" content="雨水落进大海">
+<meta property="og:image" content="/imgs/hugo_next_avatar.png">
+<meta property="og:image:width" content="312">
+<meta property="og:image:height" content="312">
+<meta property="og:image:type" content="image/jpeg/png/svg/jpg">
+<meta property="og:url" content="/post/20230101_02/">
+<meta property="og:site_name" content="白夜的博客">
+<meta property="og:locale" content="zh-CN">
+<meta property="article:author" content="白夜">
+<meta property="article:published_time" content="2023-01-01 19:05:02 +0800 +0800">
+<meta property="article:modified_time" content="2023-01-01 19:05:02 +0800 +0800">
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/font-awesome/6.1.2/css/all.min.css>
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/animate.css/3.1.1/animate.min.css>
+<link type=text/css rel=stylesheet href=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.css>
+<link rel=stylesheet href=/css/main.min.b6b7c64c91f406436dfb5af5fb824afde0a9bff3df38791c85e603b522e49a2e.css>
+<style type=text/css>.post-footer,.flinks-list-footer hr:after{content:"~ 我可是有底线的哟 ~"}</style>
+<script type=text/javascript>(function(){localDB={set:function(b,c,a){if(a===0)return;const d=new Date,e=a*864e5,f={value:c,expiry:d.getTime()+e};localStorage.setItem(b,JSON.stringify(f))},get:function(a){const b=localStorage.getItem(a);if(!b)return void 0;const c=JSON.parse(b),d=new Date;return d.getTime()>c.expiry?(localStorage.removeItem(a),void 0):c.value}},theme={active:function(){const a=localDB.get('theme');if(a==void 0)return;theme.toggle(a),window.matchMedia("(prefers-color-scheme: dark)").addListener(function(a){theme.toggle(a.matches?'dark':'light')})},toggle:function(a){document.documentElement.setAttribute('data-theme',a),localDB.set('theme',a,2);const b=document.querySelector('iframe.giscus-frame');if(b){const c={setConfig:{theme:a}};b.contentWindow.postMessage({giscus:c},'https://giscus.app')}}},theme.active()})(window)</script>
+<script class=next-config data-name=page type=application/json>{"comments":false,"isHome":false,"isPage":true,"path":"20230101_02","permalink":"/post/20230101_02/","title":"Paxos 共识算法（第一次尝试）","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
+<script type=text/javascript>document.addEventListener('DOMContentLoaded',()=>{var a=document.createElement('script');a.charset="UTF-8",a.src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js",a.async=!1,a.defer=!0,document.head.appendChild(a),a.onload=function(){NexT.utils.fmtBusuanzi()}})</script>
+<title>Paxos 共识算法（第一次尝试） - 白夜的博客</title>
+<noscript>
+<link rel=stylesheet href=/css/noscript.css>
+</noscript>
+</head>
+<body itemscope itemtype=http://schema.org/WebPage>
+<div class=headband></div>
+<main class=main>
+<header class=header itemscope itemtype=http://schema.org/WPHeader>
+<div class=header-inner>
+<div class=site-brand-container>
+<div class=site-nav-toggle>
+<div class=toggle aria-label=切换导航栏 role=button>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+</div>
+</div>
+<div class=site-meta>
+<a href=/ class=brand rel=start>
+<i class=logo-line></i>
+<h1 class=site-title>白夜的博客</h1>
+<i class=logo-line></i>
+</a>
+<p class=site-subtitle itemprop=description>白夜的博客</p>
+</div>
+<div class=site-nav-right>
+<div class="toggle popup-trigger">
+<i class="fa fa-search fa-fw fa-lg"></i>
+</div>
+</div>
+</div>
+<nav class=site-nav>
+<ul class="main-menu menu">
+<li class="menu-item menu-item-home">
+<a href=/ class=hvr-icon-pulse rel=section><i class="fa fa-home hvr-icon"></i>首页
+</a>
+</li>
+<li class="menu-item menu-item-about">
+<a href=/about/ class=hvr-icon-pulse rel=section><i class="fa fa-user hvr-icon"></i>关于
+</a>
+</li>
+<li class="menu-item menu-item-archives">
+<a href=/archives/ class=hvr-icon-pulse rel=section><i class="fa fa-archive hvr-icon"></i>归档
+<span class=badge>10</span>
+</a>
+</li>
+<li class="menu-item menu-item-search">
+<a role=button class="popup-trigger hvr-icon-pulse"><i class="fa fa-search fa-fw hvr-icon"></i>搜索
+</a>
+</li>
+</ul>
+</nav>
+<div class=search-pop-overlay>
+<div class="popup search-popup">
+<div class=search-header>
+<span class=search-icon>
+<i class="fa fa-search"></i>
+</span>
+<div class=search-input-container>
+<input autocomplete=off autocapitalize=off maxlength=80 placeholder=搜索... spellcheck=false type=search class=search-input>
+</div>
+<span class=popup-btn-close role=button>
+<i class="fa fa-times-circle"></i>
+</span>
+</div>
+<div class="search-result-container no-result">
+<div class=search-result-icon>
+<i class="fa fa-spinner fa-pulse fa-5x"></i>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toggle sidebar-toggle" role=button>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+<span class=toggle-line></span>
+</div>
+<aside class=sidebar>
+<div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+<ul class=sidebar-nav>
+<li class=sidebar-nav-toc>
+文章目录
+</li>
+<li class=sidebar-nav-overview>
+站点概览
+</li>
+</ul>
+<div class=sidebar-panel-container>
+<div class="post-toc-wrap sidebar-panel">
+<div class="post-toc animated"><nav id=TableOfContents>
+<ul>
+<li><a href=#共识问题>共识问题</a></li>
+<li><a href=#如何选择一个值>如何选择一个值</a></li>
+<li><a href=#paxos-算法的推导>Paxos 算法的推导</a>
+<ul>
+<li><a href=#从最简单的场景出发>从最简单的场景出发</a></li>
+<li><a href=#先协商再提案>先协商再提案</a></li>
+<li><a href=#给提案附加编号>给提案附加编号</a></li>
+<li><a href=#目前为止的流程梳理>目前为止的流程梳理</a></li>
+</ul>
+</li>
+</ul>
+</nav></div>
+</div>
+<div class="site-overview-wrap sidebar-panel">
+<div class="site-author site-overview-item animated" itemprop=author itemscope itemtype=http://schema.org/Person>
+<img class=site-author-image itemprop=image alt=白夜 src=/imgs/img-lazy-loading.gif data-src=/imgs/hugo_next_avatar.png>
+<p class=site-author-name itemprop=name>白夜</p>
+<div class=site-description itemprop=description>雨水落进大海</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+<nav class=site-state>
+<div class="site-state-item site-state-posts">
+<a href=/archives/>
+<span class=site-state-item-count>10</span>
+<span class=site-state-item-name>日志</span>
+</a>
+</div>
+<div class="site-state-item site-state-categories">
+<a href=/categories/>
+<span class=site-state-item-count>0</span>
+<span class=site-state-item-name>分类</span>
+</a>
+</div>
+<div class="site-state-item site-state-tags">
+<a href=/tags/>
+<span class=site-state-item-count>0</span>
+<span class=site-state-item-name>标签</span>
+</a>
+</div>
+</nav>
+</div>
+<div class="links-of-social site-overview-item animated">
+</div>
+<div class="cc-license animated" itemprop=license>
+<a href=https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh class=cc-opacity rel=noopener target=_blank title=共享知识>
+<img src=/imgs/img-lazy-loading.gif data-src=/imgs/cc/big/by_nc_sa.svg alt=共享知识>
+</a>
+</div>
+<div class="links-of-blogroll site-overview-item animated">
+<div class=links-of-blogroll-title>
+<i class="fa fa-globe fa-fw"></i>友情链接
+</div>
+<ul class=links-of-blogroll-list>
+<li class=links-of-blogroll-item>
+<a href=https://gitee.com/hugo-next/hugo-theme-next title=https://gitee.com/hugo-next/hugo-theme-next target=_blank>Hugo-NexT</a>
+</li>
+<li class=links-of-blogroll-item>
+<a href=https://lisenhui.cn title=https://lisenhui.cn target=_blank>凡梦星尘空间站</a>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id=siteinfo-card-widget class=sidebar-card-widget>
+<div class=item-headline>
+<i class="fas fa-chart-line"></i>
+<span>网站资讯</span>
+</div>
+<div class=siteinfo>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa-solid fa-calendar-check"></i>已运行：</div>
+<div class=item-count id=runTimes data-publishdate=2022-12-19T13:36:20+08:00></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name>
+<i class="fas fa fa-user"></i>总访客数：
+</div>
+<div class=item-count id=busuanzi_value_site_uv><i class="fa fa-sync fa-spin"></i></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name>
+<i class="fas fa fa-eye"></i>页面浏览：
+</div>
+<div class=item-count id=busuanzi_value_site_pv><i class="fa fa-sync fa-spin"></i></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-font"></i>总字数：</div>
+<div class=item-count id=wordsCount data-count=20354></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-mug-hot"></i>阅读约：</div>
+<div class=item-count id=readTimes data-times=46></div>
+</div>
+<div class=siteinfo-item>
+<div class=item-name><i class="fa fa-clock-rotate-left"></i>最后更新于：</div>
+<div class=item-count id=last-push-date data-lastpushdate=2023-01-09T15:43:43+08:00></div>
+</div>
+</div>
+</div>
+</aside>
+<div class=sidebar-dimmer></div>
+</header>
+<div class=tool-buttons>
+<div id=toggle-theme class=button title=深浅模式切换>
+<i class="fas fa-adjust"></i>
+</div>
+<div class=back-to-top role=button title=返回顶部>
+<i class="fa fa-arrow-up"></i>
+<span>0%</span>
+</div>
+</div>
+<div class=reading-progress-bar></div>
+<a role=button class="book-mark-link book-mark-link-fixed"></a>
+<noscript>
+<div class=noscript-warning>Theme NexT works best with JavaScript enabled</div>
+</noscript>
+<div class="main-inner post posts-expand">
+<div class=post-block>
+<article itemscope itemtype=http://schema.org/Article class=post-content lang>
+<link itemprop=mainEntityOfPage href=/post/20230101_02/>
+<span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=name content="白夜">
+</span>
+<span hidden itemprop=publisher itemscope itemtype=http://schema.org/Organization>
+<meta itemprop=name content="白夜">
+<meta itemprop=description content="雨水落进大海">
+</span>
+<span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
+<meta itemprop=name content="Paxos 共识算法（第一次尝试）">
+<meta itemprop=description content="共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只">
+</span>
+<header class=post-header>
+<h1 class=post-title itemprop="name headline">Paxos 共识算法（第一次尝试） </h1>
+<div class=post-meta-container>
+<div class=post-meta-items>
+<span class=post-meta-item>
+<span class=post-meta-item-icon>
+<i class="far fa-calendar"></i>
+</span>
+<span class=post-meta-item-text>发表于：</span>
+<time title="发表于：2023-01-01 19:05:02 +0800 +0800" itemprop="dateCreated datePublished" datetime="2023-01-01 19:05:02 +0800 +0800">2023-01-01</time>
+</span>
+</div>
+<div class=post-meta-items>
+<span class=post-meta-item title=字数>
+<span class=post-meta-item-icon>
+<i class="far fa-file-word"></i>
+</span>
+<span class=post-meta-item-text>字数：</span><span>4643</span>
+</span>
+<span class=post-meta-item title=阅读>
+<span class=post-meta-item-icon>
+<i class="far fa-clock"></i>
+</span>
+<span class=post-meta-item-text>阅读：&ap;</span>
+<span>10分钟</span>
+</span>
+<span class=post-meta-item title=浏览>
+<span class=post-meta-item-icon>
+<i class="far fa-eye"></i>
+</span>
+<span class=post-meta-item-text>
+浏览：
+</span>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/20230101_02/>
+<i class="fa fa-sync fa-spin"></i>
+</span>
+</span>
+</div>
+</div>
+</header>
+<div class="post-body autonumber" itemprop=articleBody>
+<h2 id=共识问题>共识问题</h2>
+<p>对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只有一个能被选中（chosen）。如果没有提议，那么就不会有值被选中。如果一个值被选中之后，进程能够学习到（learn）这个被选中的值。</p>
+<p>共识算法的安全性要求如下：</p>
+<ul>
+<li>提议中的值才能被选中被</li>
+<li>只有一个值能被选中</li>
+<li>只有被选中的值被确定下来之后，进程才能学习到这个值</li>
+</ul>
+<p>在 Paxos 算法中主要有两种类型的角色：</p>
+<ul>
+<li>proposers：提案者，负责对变量的值发出提案。</li>
+<li>acceptors：接受者，负责对提案进行决策。</li>
+</ul>
+<p>在实际的实现当中，一个进程可能在不同时刻担任不同的角色。</p>
+<p>我们假设进程之间通过消息进行通信，并使用异步的、非拜占庭式的故障模型：</p>
+<ul>
+<li>进程可能会以任意的速度运行，可能会崩溃，可能会重启。值别选中之后然后进程重启了，这种情况完全有可能，所以共识算法必须要采取持久化存储来保证进程崩溃和重启之后仍然能够记住某些决策信息。</li>
+<li>进程发送的消息送达的耗时是不确定的，可能会花费非常长的时间，可能会重复、丢失，但是绝不会被篡改（非拜占庭）。</li>
+</ul>
+<h2 id=如何选择一个值>如何选择一个值</h2>
+<p>最简单的方法是只有一个acceptor。一个 proposer 发送一个提案（proposal）给 acceptor，acceptor 接受（accepted）第一个收到的提案。
+只有一个 Acceptor，最显而易见的问题是：如果它挂掉了，那么共识协议就无法进行下去。</p>
+<p>为了避免单点故障，我们采用使用多个 acceptor 才参与决策。proposer 将提案请求发送给每个 acceptor，如果其中多数的acceptor接受了它的提案，那么该提案就被选中了。这里的多数是指超过1/2。这时有没有可能出现两个值都被选中了呢？我们假设存在这种情况，被选中的值分别为 v1 和 v2，接受它们的acceptor集合分别为 S1 和 S2，且 v1 不等于 v2. 由于 S1 和 S2 都是多数的acceptor集合，它们之间必有交集。如果 v1 和 v2 都被选中了，说明它们的交集 S 中的acceptor至少接受了两个不同的提案。这就违反了算法的安全性要求，我们希望有且只有一个值被选中，因此我们需要对 acceptor 的决策行为作出限制，即：acceptor 最多只能接收一个提案。</p>
+<p>此时，我们需要明确一下提案的内容，目前为止，提案就是值对变量的取值，不包含其他内容。</p>
+<p>此时，我们可以回答小节的标题“如何选择一个值”？答案就是：当acceptor中的多数接受了（accepted）一个提案时，它就被选中（chosen）了，它就是acceptor和proposer达成的共识。</p>
+<h2 id=paxos-算法的推导>Paxos 算法的推导</h2>
+<p>现在我们只知道提案被选中的判定方式，而算法对于 acceptor 和 proposer 施加怎样的限制以及两者交互的协议如何设计还不得而知。下面我们将从最简单的情景出发，逐步推导出整个算法的流程。</p>
+<p>假设我们的算法设计已经完成，那么它肯定能满足一些最简单的场景。</p>
+<h3 id=从最简单的场景出发>从最简单的场景出发</h3>
+<p>假设我们现在只有一个 proposer，它只发出了一个提案，在没有消息丢失或者进程崩溃的情况下，我们想让这个唯一的提案被选中。这听起来有点难以理解。如果这样想：整个系统里面只有一个提案，那它成为共识不是很自然的事情吗？毕竟，没有任何其他人提出任何其他的意见。这里，我们有意忽略了时间这个要素，但是可以继续假设一个极端的情形，在无限远的时间内，只有这一个提案，我们必须要接受它。这就对于 acceptor 提出了一个最简单的决策要求：</p>
+<p><code>P1. 一个 Acceptor 必须接受它收到的第一个提案</code></p>
+<p>在上面极端的情形中，如果 acceptor 不接受它收到的这个唯一的提案，我们便不能形成这各想当然的唯一的共识。但是为什么是“第一个”呢？在只有一个提案的情况，以“第一个”和“最后一个”来描述它达到的顺序同样正确。因为“最后一个”隐含了对于时间的要求，比如“在3分钟内的最后一个”，“在过去7天内的最后一个”，然而，我们的算法并不对时间作出限制，所以判定“最后一个”是不可能的。</p>
+<p>P1 的要求如此简陋，我们可以轻而易举地找到它的一个问题场景：</p>
+<p><img src=/imgs/img-lazy-loading.gif data-src=http://git.lonsun.cn/ex9-project/project-knowledge/uploads/babd2fc566d6cab2578248740b88b8e3/image.png alt=image></p>
+<p>在如图所示的场景中，S1 到 S5 既是proposer 也是 acceptor，它们可以向自身发出提案和接收自身的提案。proposer 和 acceptor 是同一个进程的情况是比较常见的。</p>
+<p>S1 向 S1, S2 发出 red 的提案，并被接受；S3 向 S3 和 S4 发出 blue 的提案，并被接受；S5 向自身发出提案并被接受。此时，任意一种值都不能形成多数，如果 S1 再像向 S3 发出请求，由于 S3 已经接受了 blue（收到的第一个提案），而且 red 不等于 blue，S4 和 S5 也是如此。所以 S1 提案的 red 在第一轮提案中不可能成为共识; S3 和 S5 也同样失败了。S1 再次发次提案行不行呢？由于acceptor不能撤销它接受的提案，所以除了 S1 和 S2 之外它不可能再取得其他 acceptor 的接受。共识过程陷入了死局。</p>
+<h3 id=先协商再提案>先协商再提案</h3>
+<p>如果 S1 在正式进行提案之前先和所有的acceptor打个招呼，等会我提案的时候你只接受我的，其他 proposer 都要拒绝掉。我们将打招呼的请求称为 Prepare 请求，将正式的提案请求称为 Accept 请求。</p>
+<p>为了正确地履行给 proposer 的承诺，acceptor 必须要能够区分不同的 proposer。为此，proposer 可以将自己的唯一标志发送给 acceptor，并让它记住。比如 S1 的标志就是 1，S3 的标志就是 3。问题又来了，在 Prepare 请求中 acceptor 记住的 proposer 能不能更改呢？这个问题似乎和提案的值能不能更改有点类似。必须要能更改。假如 S2 在 Prepare 请求中承诺只接受 S1 的提案，结果 S1 在这时候突然挂掉了，此后再也没有醒来。S2 这个决策者就这样干巴巴地等着 S1 的 Prepare 请求，并履行承诺拒绝其他 proposer 的请求，等于 S2 陷入了一个死锁的情况，资源无法释放。如果要能更改的话，从锁的角度来说，S2 就变成了一个可抢占的锁。</p>
+<p>可是如果在 Prepare 请求中 acceptor 记住的 proposer 可以更改的话，岂不是 acceptor 的承诺是没有保证的吗？例如：S1 前脚收到了 S2 的承诺，后脚 S2 就又答应了 S3 了。干脆让 S2 承诺之后拒绝其他 proposer 的 Prepare 请求算了。但这样又会回到之前的说的由于 proposer 故障导致 acceptor 一直被占用的情况。</p>
+<p>又要能变，又不能随意地变？等等，acceptor 的承诺一直变化的话也许对于结果没有影响。</p>
+<p>我们继续看看 Accept 请求，S2 此时在将自己的标志加上提案发送给所有的acceptor，如果幸运的话，多数 acceptor 接受了它的提案，从返回的响应里面，S2 得知自己的提案已经被选中。那么问题又来了，其他 proposer 如何学习到这个值呢？在 Accept 请求的回应中或者更早一点在 Prepare 请求的响应中，如果一个 acceptor 已经接受了某个提案，将它返回给 proposer，然后 proposer 从中选取一个提案的值并使用它发出 Accept 请求，这样系统就能对变量的值的认知快速收敛。</p>
+<p>下面我们明确一下这两个请求的过程：</p>
+<ol>
+<li>
+<p>Prepare 请求：proposer 将自己的标志发给所有 acceptor，如果响应中包含提案的话，就从中选择一个值作为自己的提案。</p>
+</li>
+<li>
+<p>Accept 请求：proposer 将自己的标志加上提案的中发送给所有 acceptor，如果半数以上的 acceptor 回复接受的话，那么 proposer 就认定自己的值被选中。否则重复步骤1.</p>
+</li>
+</ol>
+<p>在 Prepare 请求的响应中，proposer 可能接收到多个提案的值，从中选择哪一个进行跟随才能更快加速共识收敛呢？
+或者说，这些不同的提案哪一个更有利于共识的形成？需要明确的是，我们对提案的值没有偏好，各个 proposer 之间是平等的，我们不会偏爱某个值。因此，必须对提案附加一些额外的信息来定制一些规则加速共识收敛。</p>
+<h3 id=给提案附加编号>给提案附加编号</h3>
+<p>如果我们给每个提案一个编号，类似于数据库中的主键，然后在选择提案进行追随时选择那个编号最大的，仅仅这样做就可以了吗？</p>
+<p>现在我们的提案不仅仅是值那么简单，还有编号。所以，完整的提案结构包含两个部分：提案的编号，提案的值。</p>
+<p>假设我们已经知道了被选中的值，怎么让它在整个共识协议过程中逐渐地披露出来呢？</p>
+<p>我们回头想一想，proposer 在 Prepare 请求阶段收到的提案中随机选一个作为自己提案的值，这样行不行呢？有可能行，但我们的要求是算法必须能够正确地得到答案，而不是有时行，有时不行。</p>
+<p>如果 proposer 选择了那个编号最大的提案作为自己的提案，acceptor 应该也要修改一下规则以保证更大编号的提案优先被接受。发生在多个进程之间的算法过程也可以看做协议，需要多边都作出举措以促进结果的形成。</p>
+<p>acceptor 目前的决策规则是能够接收相同值的提案，为了使得编号更大提案有更大的优先级，我们需要调整一下规则：</p>
+<p><code>P2. 如果一个值为 v 的提案已经被选中，那么任何更大编号的被接收的提案的值也是 v.</code></p>
+<p>那么更小编号的提案呢？那就需要拒绝掉，要不然使用编号大小形成的优先级无法保证。我们的初衷是利用编号形成的优先级规则帮助整个系统更快地达到共识，换句话说，我们要让已经某个多数派接收的值更快地传播到系统内的所有节点上。</p>
+<p>由于只有 acceptor 才能对提案进行接受或者拒绝，很自然地，我们由 P2 推导出：</p>
+<p><code>P2_a：如果一个值为v 的提案已经被选中，那么任意acceptor接受的更大编号的提案的值都是 v</code>。</p>
+<p>“更大的”编号总有一个标准，它比较就是这个已经接受的提案的编号。</p>
+<p>我们的规则变得越来越复杂，但是它仍然要满足最简单的场景。试想：假设在一个提案被选中后，有一个proposer经过prepare阶段后碰巧发现acceptor还没有接收过任意提案，于是便发出了更大编号的提案给了一个从未接受过任何提案的acceptor，而此时其他acceptor已经对某个提案形成多数，按照 P1，这个acceptor必须接受当前的提案，可是这又违反了 P2_a。为了同时满足 P1 和 P2_a，必须对 proposer 提出的提案进行限制：</p>
+<p><code>P2_b：如果一个值为v的提案已经被选中，那么任意proposer发出的更大编号的的提案的值都是 v</code>.</p>
+<p>可是，一个proposer在正式提案之前如何得知已经被选中的值呢？这又回到了我们说到的从 Prepare 请求的响应中挑选一个提案的问题了 ———— 选择编号最大的那个。</p>
+<h3 id=目前为止的流程梳理>目前为止的流程梳理</h3>
+<p>从 proposer 的角度：</p>
+<ol>
+<li>
+<p>Prepare 阶段：proposer 向所有 acceptor 发送请求，要求它们只接受自己的提案。在收到的响应中如果有提案，选择那个编号最大的提案的值作为自己的提案的值；如果没有的话，使用自己的值。</p>
+</li>
+<li>
+<p>Accept 阶段：proposer 向所有 acceptor 发送提案请求，包含proposerId、提案编号和提案的值。要求它们接受自己的提案。如果收到半数以上的接受恢复，就认为自己的提案成为了共识。</p>
+</li>
+</ol>
+<p>从 Acceptor 的角度：</p>
+<ol>
+<li>
+<p>收到 Prepare 请求：将proposerId 存储下来，如果已经有接受的提案，返回给proposer。</p>
+</li>
+<li>
+<p>收到 Accept 请求：如果已经有接受的提案，并且当前请求的编号大于当前接受的提案的编号，就接受该提案，返回OK。如果小于接受的提案的编号，就拒绝。如果没有接受过任何提案，且请求的 proposerId 与存储的 proposerId 相同，接受该提案，返回 Ok；否则，返回拒绝响应。</p>
+</li>
+</ol>
+<p>如果我们将 proposerId 从请求参数中移除，仅仅使用提案的编号，那么算法流程如下：</p>
+<p>从 proposer 的角度：</p>
+<ol>
+<li>
+<p>Prepare 阶段：proposer 向所有 acceptor 发送请求，要求它们不能接收比当前编号小的提案。在收到的响应中如果有提案，选择那个编号最大的提案的值作为自己的提案的值；如果没有的话，使用自己的值。</p>
+</li>
+<li>
+<p>Accept 阶段：proposer 向所有 acceptor 发送提案请求，包含提案编号和提案的值。要求它们接受自己的提案。如果收到半数以上的接受恢复，就认为自己的提案成为了共识。</p>
+</li>
+</ol>
+<p>从 Acceptor 的角度：</p>
+<ol>
+<li>
+<p>收到 Prepare 请求：如果有接受的提案，且编号比当前请求小，更新存储的编号，回复OK，并带上接收的提案；如果编号比当前请求大，则拒绝当前的prepare请求，回复拒绝。如果没有接收的提案，且没有接收过 prepare 请求，储存当前的编号；如果已经收到过 Prepare 请求，如果编号被当前请求大，则拒绝当前的prepare请求；否则，更新存储的编号。</p>
+</li>
+<li>
+<p>收到 Accept 请求：如果编号大于存储的值，则接收值；</p>
+</li>
+</ol>
+</div>
+<footer class=post-footer>
+<div class=addthis_inline_share_toolbox style=text-align:center></div>
+<hr>
+<div class=post-copyright>
+<img src=/imgs/cc/cc.svg width=75 height=75 align=right>
+<ul>
+<li class=post-copyright-title>
+<strong>文章标题：</strong>
+Paxos 共识算法（第一次尝试）
+</li>
+<li class=post-copyright-author>
+<strong>本文作者： </strong>
+白夜
+</li>
+<li class=post-copyright-link>
+<strong>本文链接：</strong>
+<a id=post-cr-link href=/post/20230101_02/ title="Paxos 共识算法（第一次尝试）">/post/20230101_02/</a>
+</li>
+<li class=post-copyright-license>
+<strong>版权声明： </strong>
+本博客所有文章除特别声明外，均采用 <i class="fab fa-fw fa-creative-commons"></i><a target=_blank href=https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh>BY-NC-SA</a> 许可协议。转载请注明出处！
+</li>
+</ul>
+</div>
+<div class=post-nav>
+<div class="post-nav-next post-nav-item">
+<a href=/post/20230101_03/ rel=next title="Paxos 共识算法（第二次尝试）">
+<i class="fa fa-chevron-left"></i> Paxos 共识算法（第二次尝试）
+</a>
+</div>
+<div class="post-nav-prev post-nav-item">
+<a href=/post/20221229_01/ rel=prev title=理解Paxos算法的几种建模方法>
+理解Paxos算法的几种建模方法
+<i class="fa fa-chevron-right"></i>
+</a>
+</div>
+</div>
+</footer>
+</article>
+</div>
+</div>
+</main>
+<footer class=footer>
+<div class=footer-inner>
+<div class=copyright>
+&copy;
+<span itemprop=copyrightYear>
+2010 - 2023
+</span>
+<span class=with-love>
+<i class="fa fa-heart"></i>
+</span>
+<span class=author itemprop=copyrightHolder>白夜</span>
+</div>
+<div class=powered-by>
+由 <a href=https://gohugo.io title=0.91.2 target=_blank>Hugo</a> & <a href=https://github.com/hugo-next/hugo-theme-next title=4.4.1 target=_blank>Hugo NexT.Gemini</a> 强力驱动
+</div>
+</div>
+</footer>
+<script type=text/javascript src=https://cdn.staticfile.org/animejs/3.2.1/anime.min.js defer></script>
+<script type=text/javascript src=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.js defer></script>
+<script class=next-config data-name=main type=application/json>{"bookmark":{"color":"#222","enable":true,"save":"manual"},"busuanzi":{"pageview":true},"copybtn":true,"darkmode":true,"giscus":{"cfg":{"category":"Comments","categoryid":null,"emit":false,"inputposition":"top","mapping":"title","reactions":false,"repo":"username/repo-name","repoid":null,"theme":"preferred_color_scheme"},"js":"https://giscus.app/client.js"},"hostname":"/","i18n":{"ds_day":" 天前","ds_days":" 天 ","ds_hour":" 小时前","ds_hours":" 小时 ","ds_just":"刚刚","ds_min":" 分钟前","ds_mins":" 分钟","ds_month":" 个月前","ds_years":" 年 ","empty":"没有找到任何搜索结果：${query}","hits":"","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","placeholder":"搜索..."},"lang":"zh-CN","lazyload":false,"localSearch":{"enable":true,"path":"/searchindexes.xml","preload":false,"topnperarticle":-1,"trigger":"auto","unescape":false},"motion":{"async":true,"enable":false,"transition":{"collheader":"fadeInLeft","postblock":"fadeIn","postbody":"fadeInDown","postheader":"fadeInDown","sidebar":"fadeInUp"}},"root":"/","scheme":"Gemini","sidebar":{"display":"post","offset":12,"padding":18,"position":"left","width":256},"statis":{"enable":true,"plugin":"busuanzi"},"vendor":{"plugins":"qiniu","router":"https://cdn.staticfile.org"},"version":"4.4.1","waline":{"cfg":{"comment":true,"emoji":false,"imguploader":false,"pageview":true,"placeholder":"请文明发言哟 ヾ(≧▽≦*)o","reaction":true,"reactiontext":["点赞","踩一下","得意","不屑","尴尬","睡觉"],"reactiontitle":"你认为这篇文章怎么样？","requiredmeta":["nick","mail"],"serverurl":null,"sofa":"快来发表你的意见吧 (≧∀≦)ゞ","wordlimit":200},"css":{"alias":"waline","file":"dist/waline.css","name":"@waline/client","version":"2.13.0"},"js":{"alias":"waline","file":"dist/waline.js","name":"@waline/client","version":"2.13.0"}}}</script>
+<script type=text/javascript src=/js/main.min.44f22194cdbaf801583669f62e9338396a1209e5770f9210e5450ba9b6f498b2.js defer></script>
+</body>
+</html>

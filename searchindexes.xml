@@ -1,6 +1,118 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><search><entry><title>完美是一个结果</title><url>/post/20230101_01/</url><categories/><tags/><content type="html">完美是一个结果，如果一开始就奔着完美去，那可能永远无法开始。
-尽早开始，慢慢迭代，慢慢打磨。如果最终结局没有那么好，也好过从未开始过。
-在路上，那风景才会变化。而到达，有那么重要吗？</content></entry><entry><title>理解Paxos算法的几种建模方法</title><url>/post/20221229_01/</url><categories/><tags/><content type="html">从并发编程锁的角度 Paxos made simple 论文导读
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><search><entry><title>Ubuntu 22 虚拟机扩容</title><url>/post/linux_space_extend/</url><categories/><tags/><content type="html">首先关闭虚拟机，然后给虚拟机磁盘扩容。
+fdisk /dev/sda 进入之后按 d 选择删除 sda 现存的分区，从最大分区开始删，一直删到第一个。
+然后新建分区：n, p, 一路回车
+之后 reboot
+在进入 ：
+resize2fs /dev/sda4 lvextend -l +100%FREE /dev/mapper/ubuntu--vg-ubuntu--lv resize2fs /dev/mapper/ubuntu--vg-ubuntu--lv resize2fs /dev/sad4 是扩充最大编号的分区</content></entry><entry><title>Paxos 共识算法（第二次尝试）</title><url>/post/20230101_03/</url><categories/><tags/><content type="html">共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只有一个能被选中（chosen）。 如果没有提议，那么就不会有值被选中。如果一个值被选中之后，进程能够学习到（learn）这个被选中的值。
+经典的共识算法主要有 Paxos 和 Raft。今天我们介绍 Paxos 算法。
+共识算法应用案例 Etcd Etcd 是 CoreOS 基于 Raft 协议开发的分布式键值对存储 (key-value peer store) ，设计用来可靠而快速的保存关键数据并提供访问。
+etcd 可用于：
+共享配置 服务发现 分布式锁或一致性保障 分布式数据队列 分布式通知和协调 集群选举 微信 PhxPaxos PhxPaxos是腾讯公司微信后台团队自主研发的一套基于Paxos协议的多机状态拷贝类库。 它以库函数的方式嵌入到开发者的代码当中， 使得一些单机状态服务可以扩展到多机器，从而获得强一致性的多副本以及自动容灾的特性。 这个类库在微信服务里面经过一系列的工程验证，并且我们对它进行过大量的恶劣环境下的测试，使其在一致性的保证上更为健壮。
+OceanBase OceanBase 数据库使用 Paxos 的优化 Multi-Paxos 实现多副本数据同步以及集群的高可用。
+Apache Kafka 使用 KRaft 替换 ZooKeeper Apache Kafka 3.3 Replaces ZooKeeper with the New KRaft Consensus Protocol
+KRaft is the consensus protocol developed to allow metadata management directly in Apache Kafka. This greatly simplifies Kafka’s architecture by consolidating responsibility for metadata into Kafka itself without the requirement of a third-party tool like Apache ZooKeeper.
+Apache Kafka 替换 ZooKeeper 为 自身实现的 KRaft 协议用于元数据的管理。
+故障模型 我们假设进程之间通过消息进行通信，并使用异步的、非拜占庭式的故障模型：
+进程可能会以任意的速度运行，可能会崩溃，可能会重启。值别选中之后然后进程重启了，这种情况完全有可能，所以共识算法必须要采取持久化存储来保证进程 崩溃和重启之后仍然能够记住某些决策信息。
+进程发送的消息送达的耗时是不确定的，可能会花费非常长的时间，可能会重复、丢失， 但是绝不会被篡改（非拜占庭）。
+安全性要求 共识算法的安全性要求如下：
+提议中的值才能被选中 只有一个值能被选中 只有被选中的值被确定下来之后，进程才能学习到这个值 活性要求 只要超过半数的server能正常工作，并且消息也能在合理的延时范围内达到，那么系统就能够正常工作，得出正常的结果。正常工作包含两个方面：
+总是确定最终选定一个值，而不是一直处于一个没有值被选中的状态中。 如果一个值被选中（chosen），那么其他的server最终必然能够得知这个值。 Paxos 算法 基本组件 Paxos 算法中需要两个组件相互配合：提议者（proposer）和 接受者（acceptor）。
+提议者（proposers）：系统的主动部分，接收客户端的请求，根据请求向其他的server提议特定的值，尝试让其他server接受并最终选定这个值。 接受者（acceptors）：系统的被动部分，接收提议者的请求并做出响应。响应的结果可以看成一次投票，表示接受者是否接收提议者的提议。 下面我们简单推导一下Paxos算法的流程。
+单个 acceptor 只有一个 acceptor 来处理所有的提议。当不同的提议提交之后，acceptor 从中选择一个值作为选定值。但是，这个唯一的 acceptor 挂掉之后，我们就 无法得知选中的值了。
+多个 acceptor 为了解决acceptor单点故障的问题，我们采用多个 acceptor，并采用朴素的少数服务多数的原则，如果一个提议被多数acceptor接受之后，就认为是被选定了。 这样的话，如果一个 acceptor 宕机了，剩下的acceptor仍然能告诉我们被选定的值是什么。
+那么acceptor采用怎样的策略接受提议呢？我们不妨使用最简单方案：接受它收到的第一个提议。
+但是这样可能发生如图所示的分裂的情况，没有任何值被过半的acceptor所接受，没有任何中被选中，违反了算法的安全性要求。
+如果acceptor可以改变自己的想法，接受多个不同的值呢？
+不幸的是，此时可能产生多个被选中的值。
+这个问题的解决方案是：proposer 在提议之前，如果发现一个值已经被选定，那么必须抛弃自己的提议，只能提议被选定的值。所以 s5 在提议之前，需要先 确定是否已经有其他值被选中。所以在正式提案之前先进行一次查询，这个方案就是二阶段协议 (2-phase protocol).
+两阶段协议仍然不足以解决一些问题场景。
+如图，S1 和 S5 经过查询之后碰巧都发现 acceptor 没有选定的值，所以发出自己的提议。于是，又出现两个值被选中的情况。
+这个问题的解决方案是：一旦我们选定了一个值，其他的不同的提议应该被 acceptor 拒绝并最终被整个系统淘汰掉。在这个例子中，s3 已经先接受了 s5 的提议，需要以某种方式拒绝掉 s1 的提议。
+为了达到这个目的，我们给所有的提议附加一个编号，对他们进行排序。如果 acceptor 已经接受了更新的提议，那么根据编号大小需要拒绝掉更老（更小编号） 的提议。
+也就是：
+我们需要二阶段协议，在正式提议之前，先检查是否有其他值被选中，如果有，就抛弃掉自己的值，改选已经选定的值。 所以的提议要有序。如果acceptor已经接受了新的提议，就应该拒绝掉老的提议。 Paxos 算法流程 Paxos 算法分为两个阶段，分别叫做 Prepare 阶段和 Accept 阶段。
+Prepare 阶段：proposer 尝试提议时，先广播 prepare 请求，到达两个目的：
+找到已经被选定的值 阻塞掉还没有完成的旧的提议 Accept 阶段：proposer 广播 accept 请求，让系统接收一个特定的值，如果有过半的acceptor回复接受，那么就确定这个提议被选中了。
+我们来详解解释一下这张图。
+proposer 想要提议某个值时，首先要生成一个提案编号 n，这个编号必须没有使用过，而且比当前proposer以往使用的编号都大。
+首先我们进入 prepare 阶段。在此阶段，我们的prepare请求中只有一个编号 n。当acceptor 接收到 prepare 请求时，做两件事情：
+承诺不会接受比 n 编号还小的提议。为此，acceptor 保存一个 minProposal 值，表示 acceptor 第二阶段能够接收的值的提议编号必须大于等于它。 acceptor 同时检查n是否大于 minProposal，如果是，则更新 minProposal = n. 如果之前已经接受了一个提议，需要将其作为prepare请求的响应返回给proposer。因此，acceptor 必须记录下该提案的编号和值，分别为 acceptedValue 和 acceptedProposal。 Proposer 发出prepare请求之后，等待acceptor响应，至少有过半的acceptor响应之后，才能进入第二阶段。如果acceptor收到的响应中包含接受的提案， 它将从中选择一个编号最大的提案的值作为自己的提案的值，否则使用自己的值。
+proposer 进入第二阶段后，发出的 acceptor 请求中携带两个中，编号和提案的值，编号就是 prepare 请求中的编号。
+acceptor 接收到 Prepare 请求后，比较编号与 minProposal 的值，如果大于等于它，则更新 minProposal的值为n，并且替换自己 acceptedValue 为请求中的值。如果小于则直接拒绝。不管acceptor是接受还是拒绝这个提议，acceptor都会返回自己的minProposal值给proposer。
+proposer在发送完accept请求后，就等待acceptor的响应。直到过半数的acceptor响应之后，proposer才能决定下一步做什么。 如果proposer收到的响应中有拒绝（rejection），那proposer就放弃此轮paxos，回到第一步重新再来。 如果proposer收到了过半数的acceptor的接受(accept)，那么proposer就可以确定，自己提交的值被选定了。 proposer通过比较acceptor返回的结果值（即acceptor的minProposal值）来确定自己到底是被拒绝还是被接受了： 如果结果值大于自己prepare时的提议号，那自己就是被拒绝了；否则，自己就是被接受了。
+Paxos算法应对冲突的案例 不同 proposer 的 prepare 请求和 accept 请求之间是高度并行化的，所以不同提议之间会发生很多竞争。
+我们来看一下basic paxos在几种特定的竞争状态下，怎么保证正常工作的。
+需要明确的一点是，如果 paxos 能够因为竞争而出问题，关键的时间点就发生在 proposer 第二次发出 prepare 请求的时刻。为什么是第二次呢？ 如果第二次prepare都没有，哪来竞争呢？如果第二次prepare时能顺利被解决，那第三次prepare的发出应该可以类推，又变成了第二次 prepare 请求。 我们知道所有的提议都是被按顺序编号的，所以我们要关注的就是编号较大的那次prepare。
+已经有值被选中 这里的图示显示的是acceptor的视角，P 3.1 表示这是一个编号为 3.1 的 Prepare 请求；A 3.1 X 表示这是一个编号为 3.1，值为 X 的 accept 请求。
+图中S1 和 S5 先后发出了提议。
+S1, S2, S3 已经就 X 达成了共识；S5 在向 S3, S4, S5 发送 prepare 的第一阶段中，获取到 X 的提议，于是放弃自己的值，该用 X，于是原先由 3个acceptor接受的值现在被巩固到被所有acceptor接受。
+原先的值尚未被选中 这里分为两种情况：
+新的 proposer 能看到原先的值 与第一种情况类似，S5 在prepare阶段发现 X 的存在，并使用 X 作为自己的提案的值。
+新的 proposer 未看到原先的值 S5 将使用它自己的值，原先旧的提议将被终止。S1 向 S3 发出的 accept 请求由于编号小于 4.5 而被拒绝。S5 提议的值被选中。
+Paxos算法应对崩溃的场景 acceptor 在 prepare 阶段崩溃 只要超过半数的acceptor仍可以正常响应，算法仍然能正常继续下去。
+acceptor 在 accept 阶段崩溃 只要超过板书的acceptor仍然能正常响应，算法仍然能正常继续下去。
+proposer 在 prepare 阶段崩溃 如果 proposer 在发出任何消息前崩溃，那么就和它从未运行过效果是一样的。
+如果它已经发出了一些 prepare 请求，某些 acceptor 会发回响应，然而没有后续的 accept 请求。不过其他的节点也在继续Paxos算法，并使用更大 的编号来废弃掉失败的提议；如果编号没有超过它的话，那么只能自己选择一个更大的编号来阻塞掉之前的旧的提议。
+如果 proposer 在 accept 阶段失败，但是至少被一个acceptor接受了。那么后续proposer在prepare请求的响应中可能会发现这个提议，将其作为自己的 提议的值，帮助前者完成终止的Paxos过程。
+其他 如何读取到达成共识的值 运行一轮 Paxos 算法过程
+活性保证 Paxos 可能会形成活锁，如图：
+解决办法有两个：
+proposer 如果发现自己的提议被拒绝，那表明有其他proposer也在想设定这个值，那么就随机地等待一段时间， 让另一个 proposer 可以有更大的机会来完成整个流程，最终把这个值确定下来 从 proposer 中选出一个 leader，确保一个时间段内，只有一个 proposer，避免活锁的发生。 参考：
+[1] 用paxos实现多副本日志系统&amp;ndash;basic paxos部分
+[2] Implementing Replicated Logs with Paxos - Diego Ongaro</content></entry><entry><title>Paxos 共识算法（第一次尝试）</title><url>/post/20230101_02/</url><categories/><tags/><content type="html">共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只有一个能被选中（chosen）。如果没有提议，那么就不会有值被选中。如果一个值被选中之后，进程能够学习到（learn）这个被选中的值。
+共识算法的安全性要求如下：
+提议中的值才能被选中被 只有一个值能被选中 只有被选中的值被确定下来之后，进程才能学习到这个值 在 Paxos 算法中主要有两种类型的角色：
+proposers：提案者，负责对变量的值发出提案。 acceptors：接受者，负责对提案进行决策。 在实际的实现当中，一个进程可能在不同时刻担任不同的角色。
+我们假设进程之间通过消息进行通信，并使用异步的、非拜占庭式的故障模型：
+进程可能会以任意的速度运行，可能会崩溃，可能会重启。值别选中之后然后进程重启了，这种情况完全有可能，所以共识算法必须要采取持久化存储来保证进程崩溃和重启之后仍然能够记住某些决策信息。 进程发送的消息送达的耗时是不确定的，可能会花费非常长的时间，可能会重复、丢失，但是绝不会被篡改（非拜占庭）。 如何选择一个值 最简单的方法是只有一个acceptor。一个 proposer 发送一个提案（proposal）给 acceptor，acceptor 接受（accepted）第一个收到的提案。 只有一个 Acceptor，最显而易见的问题是：如果它挂掉了，那么共识协议就无法进行下去。
+为了避免单点故障，我们采用使用多个 acceptor 才参与决策。proposer 将提案请求发送给每个 acceptor，如果其中多数的acceptor接受了它的提案，那么该提案就被选中了。这里的多数是指超过1/2。这时有没有可能出现两个值都被选中了呢？我们假设存在这种情况，被选中的值分别为 v1 和 v2，接受它们的acceptor集合分别为 S1 和 S2，且 v1 不等于 v2. 由于 S1 和 S2 都是多数的acceptor集合，它们之间必有交集。如果 v1 和 v2 都被选中了，说明它们的交集 S 中的acceptor至少接受了两个不同的提案。这就违反了算法的安全性要求，我们希望有且只有一个值被选中，因此我们需要对 acceptor 的决策行为作出限制，即：acceptor 最多只能接收一个提案。
+此时，我们需要明确一下提案的内容，目前为止，提案就是值对变量的取值，不包含其他内容。
+此时，我们可以回答小节的标题“如何选择一个值”？答案就是：当acceptor中的多数接受了（accepted）一个提案时，它就被选中（chosen）了，它就是acceptor和proposer达成的共识。
+Paxos 算法的推导 现在我们只知道提案被选中的判定方式，而算法对于 acceptor 和 proposer 施加怎样的限制以及两者交互的协议如何设计还不得而知。下面我们将从最简单的情景出发，逐步推导出整个算法的流程。
+假设我们的算法设计已经完成，那么它肯定能满足一些最简单的场景。
+从最简单的场景出发 假设我们现在只有一个 proposer，它只发出了一个提案，在没有消息丢失或者进程崩溃的情况下，我们想让这个唯一的提案被选中。这听起来有点难以理解。如果这样想：整个系统里面只有一个提案，那它成为共识不是很自然的事情吗？毕竟，没有任何其他人提出任何其他的意见。这里，我们有意忽略了时间这个要素，但是可以继续假设一个极端的情形，在无限远的时间内，只有这一个提案，我们必须要接受它。这就对于 acceptor 提出了一个最简单的决策要求：
+P1. 一个 Acceptor 必须接受它收到的第一个提案
+在上面极端的情形中，如果 acceptor 不接受它收到的这个唯一的提案，我们便不能形成这各想当然的唯一的共识。但是为什么是“第一个”呢？在只有一个提案的情况，以“第一个”和“最后一个”来描述它达到的顺序同样正确。因为“最后一个”隐含了对于时间的要求，比如“在3分钟内的最后一个”，“在过去7天内的最后一个”，然而，我们的算法并不对时间作出限制，所以判定“最后一个”是不可能的。
+P1 的要求如此简陋，我们可以轻而易举地找到它的一个问题场景：
+在如图所示的场景中，S1 到 S5 既是proposer 也是 acceptor，它们可以向自身发出提案和接收自身的提案。proposer 和 acceptor 是同一个进程的情况是比较常见的。
+S1 向 S1, S2 发出 red 的提案，并被接受；S3 向 S3 和 S4 发出 blue 的提案，并被接受；S5 向自身发出提案并被接受。此时，任意一种值都不能形成多数，如果 S1 再像向 S3 发出请求，由于 S3 已经接受了 blue（收到的第一个提案），而且 red 不等于 blue，S4 和 S5 也是如此。所以 S1 提案的 red 在第一轮提案中不可能成为共识; S3 和 S5 也同样失败了。S1 再次发次提案行不行呢？由于acceptor不能撤销它接受的提案，所以除了 S1 和 S2 之外它不可能再取得其他 acceptor 的接受。共识过程陷入了死局。
+先协商再提案 如果 S1 在正式进行提案之前先和所有的acceptor打个招呼，等会我提案的时候你只接受我的，其他 proposer 都要拒绝掉。我们将打招呼的请求称为 Prepare 请求，将正式的提案请求称为 Accept 请求。
+为了正确地履行给 proposer 的承诺，acceptor 必须要能够区分不同的 proposer。为此，proposer 可以将自己的唯一标志发送给 acceptor，并让它记住。比如 S1 的标志就是 1，S3 的标志就是 3。问题又来了，在 Prepare 请求中 acceptor 记住的 proposer 能不能更改呢？这个问题似乎和提案的值能不能更改有点类似。必须要能更改。假如 S2 在 Prepare 请求中承诺只接受 S1 的提案，结果 S1 在这时候突然挂掉了，此后再也没有醒来。S2 这个决策者就这样干巴巴地等着 S1 的 Prepare 请求，并履行承诺拒绝其他 proposer 的请求，等于 S2 陷入了一个死锁的情况，资源无法释放。如果要能更改的话，从锁的角度来说，S2 就变成了一个可抢占的锁。
+可是如果在 Prepare 请求中 acceptor 记住的 proposer 可以更改的话，岂不是 acceptor 的承诺是没有保证的吗？例如：S1 前脚收到了 S2 的承诺，后脚 S2 就又答应了 S3 了。干脆让 S2 承诺之后拒绝其他 proposer 的 Prepare 请求算了。但这样又会回到之前的说的由于 proposer 故障导致 acceptor 一直被占用的情况。
+又要能变，又不能随意地变？等等，acceptor 的承诺一直变化的话也许对于结果没有影响。
+我们继续看看 Accept 请求，S2 此时在将自己的标志加上提案发送给所有的acceptor，如果幸运的话，多数 acceptor 接受了它的提案，从返回的响应里面，S2 得知自己的提案已经被选中。那么问题又来了，其他 proposer 如何学习到这个值呢？在 Accept 请求的回应中或者更早一点在 Prepare 请求的响应中，如果一个 acceptor 已经接受了某个提案，将它返回给 proposer，然后 proposer 从中选取一个提案的值并使用它发出 Accept 请求，这样系统就能对变量的值的认知快速收敛。
+下面我们明确一下这两个请求的过程：
+Prepare 请求：proposer 将自己的标志发给所有 acceptor，如果响应中包含提案的话，就从中选择一个值作为自己的提案。
+Accept 请求：proposer 将自己的标志加上提案的中发送给所有 acceptor，如果半数以上的 acceptor 回复接受的话，那么 proposer 就认定自己的值被选中。否则重复步骤1.
+在 Prepare 请求的响应中，proposer 可能接收到多个提案的值，从中选择哪一个进行跟随才能更快加速共识收敛呢？ 或者说，这些不同的提案哪一个更有利于共识的形成？需要明确的是，我们对提案的值没有偏好，各个 proposer 之间是平等的，我们不会偏爱某个值。因此，必须对提案附加一些额外的信息来定制一些规则加速共识收敛。
+给提案附加编号 如果我们给每个提案一个编号，类似于数据库中的主键，然后在选择提案进行追随时选择那个编号最大的，仅仅这样做就可以了吗？
+现在我们的提案不仅仅是值那么简单，还有编号。所以，完整的提案结构包含两个部分：提案的编号，提案的值。
+假设我们已经知道了被选中的值，怎么让它在整个共识协议过程中逐渐地披露出来呢？
+我们回头想一想，proposer 在 Prepare 请求阶段收到的提案中随机选一个作为自己提案的值，这样行不行呢？有可能行，但我们的要求是算法必须能够正确地得到答案，而不是有时行，有时不行。
+如果 proposer 选择了那个编号最大的提案作为自己的提案，acceptor 应该也要修改一下规则以保证更大编号的提案优先被接受。发生在多个进程之间的算法过程也可以看做协议，需要多边都作出举措以促进结果的形成。
+acceptor 目前的决策规则是能够接收相同值的提案，为了使得编号更大提案有更大的优先级，我们需要调整一下规则：
+P2. 如果一个值为 v 的提案已经被选中，那么任何更大编号的被接收的提案的值也是 v.
+那么更小编号的提案呢？那就需要拒绝掉，要不然使用编号大小形成的优先级无法保证。我们的初衷是利用编号形成的优先级规则帮助整个系统更快地达到共识，换句话说，我们要让已经某个多数派接收的值更快地传播到系统内的所有节点上。
+由于只有 acceptor 才能对提案进行接受或者拒绝，很自然地，我们由 P2 推导出：
+P2_a：如果一个值为v 的提案已经被选中，那么任意acceptor接受的更大编号的提案的值都是 v。
+“更大的”编号总有一个标准，它比较就是这个已经接受的提案的编号。
+我们的规则变得越来越复杂，但是它仍然要满足最简单的场景。试想：假设在一个提案被选中后，有一个proposer经过prepare阶段后碰巧发现acceptor还没有接收过任意提案，于是便发出了更大编号的提案给了一个从未接受过任何提案的acceptor，而此时其他acceptor已经对某个提案形成多数，按照 P1，这个acceptor必须接受当前的提案，可是这又违反了 P2_a。为了同时满足 P1 和 P2_a，必须对 proposer 提出的提案进行限制：
+P2_b：如果一个值为v的提案已经被选中，那么任意proposer发出的更大编号的的提案的值都是 v.
+可是，一个proposer在正式提案之前如何得知已经被选中的值呢？这又回到了我们说到的从 Prepare 请求的响应中挑选一个提案的问题了 ———— 选择编号最大的那个。
+目前为止的流程梳理 从 proposer 的角度：
+Prepare 阶段：proposer 向所有 acceptor 发送请求，要求它们只接受自己的提案。在收到的响应中如果有提案，选择那个编号最大的提案的值作为自己的提案的值；如果没有的话，使用自己的值。
+Accept 阶段：proposer 向所有 acceptor 发送提案请求，包含proposerId、提案编号和提案的值。要求它们接受自己的提案。如果收到半数以上的接受恢复，就认为自己的提案成为了共识。
+从 Acceptor 的角度：
+收到 Prepare 请求：将proposerId 存储下来，如果已经有接受的提案，返回给proposer。
+收到 Accept 请求：如果已经有接受的提案，并且当前请求的编号大于当前接受的提案的编号，就接受该提案，返回OK。如果小于接受的提案的编号，就拒绝。如果没有接受过任何提案，且请求的 proposerId 与存储的 proposerId 相同，接受该提案，返回 Ok；否则，返回拒绝响应。
+如果我们将 proposerId 从请求参数中移除，仅仅使用提案的编号，那么算法流程如下：
+从 proposer 的角度：
+Prepare 阶段：proposer 向所有 acceptor 发送请求，要求它们不能接收比当前编号小的提案。在收到的响应中如果有提案，选择那个编号最大的提案的值作为自己的提案的值；如果没有的话，使用自己的值。
+Accept 阶段：proposer 向所有 acceptor 发送提案请求，包含提案编号和提案的值。要求它们接受自己的提案。如果收到半数以上的接受恢复，就认为自己的提案成为了共识。
+从 Acceptor 的角度：
+收到 Prepare 请求：如果有接受的提案，且编号比当前请求小，更新存储的编号，回复OK，并带上接收的提案；如果编号比当前请求大，则拒绝当前的prepare请求，回复拒绝。如果没有接收的提案，且没有接收过 prepare 请求，储存当前的编号；如果已经收到过 Prepare 请求，如果编号被当前请求大，则拒绝当前的prepare请求；否则，更新存储的编号。
+收到 Accept 请求：如果编号大于存储的值，则接收值；</content></entry><entry><title>理解Paxos算法的几种建模方法</title><url>/post/20221229_01/</url><categories/><tags/><content type="html">从并发编程锁的角度 Paxos made simple 论文导读
 两阶段是先加锁再操作的过程； 引入编号是抢占锁的设计 多数派是为了获取集群的锁（鸽笼原理） 选择最大编号的提案是为了快速收敛 从多数派写的角度 可靠分布式系统-paxos的直观解释
 Request promise before write 从原论文的角度 从零开始推导，不断加强约束，最后得到完整的算法过程。
 https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html</content></entry><entry><title>Understanding Paxos</title><url>/post/understanding_paxos/</url><categories/><tags/><content type="html"> https://people.cs.rutgers.edu/~pxk/417/notes/paxos.html

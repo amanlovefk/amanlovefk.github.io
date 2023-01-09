@@ -25,7 +25,7 @@
 <link type=text/css rel=stylesheet href=https://cdn.staticfile.org/font-awesome/6.1.2/css/all.min.css>
 <link type=text/css rel=stylesheet href=https://cdn.staticfile.org/animate.css/3.1.1/animate.min.css>
 <link type=text/css rel=stylesheet href=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.css>
-<link rel=stylesheet href=/css/main.min.65039c30ace25fd8416b5f880bc59d53bd242140b765f5547417a73434033aa5.css>
+<link rel=stylesheet href=/css/main.min.b6b7c64c91f406436dfb5af5fb824afde0a9bff3df38791c85e603b522e49a2e.css>
 <style type=text/css>.post-footer,.flinks-list-footer hr:after{content:"~ 我可是有底线的哟 ~"}</style>
 <script type=text/javascript>(function(){localDB={set:function(b,c,a){if(a===0)return;const d=new Date,e=a*864e5,f={value:c,expiry:d.getTime()+e};localStorage.setItem(b,JSON.stringify(f))},get:function(a){const b=localStorage.getItem(a);if(!b)return void 0;const c=JSON.parse(b),d=new Date;return d.getTime()>c.expiry?(localStorage.removeItem(a),void 0):c.value}},theme={active:function(){const a=localDB.get('theme');if(a==void 0)return;theme.toggle(a),window.matchMedia("(prefers-color-scheme: dark)").addListener(function(a){theme.toggle(a.matches?'dark':'light')})},toggle:function(a){document.documentElement.setAttribute('data-theme',a),localDB.set('theme',a,2);const b=document.querySelector('iframe.giscus-frame');if(b){const c={setConfig:{theme:a}};b.contentWindow.postMessage({giscus:c},'https://giscus.app')}}},theme.active()})(window)</script>
 <script class=next-config data-name=page type=application/json>{"comments":false,"isHome":true,"isPage":false,"path":"/","permalink":"/","title":"白夜的博客","waline":{"js":[{"alias":"waline","alias_name":"@waline/client","file":"dist/pageview.js","name":"pageview","version":"2.13.0"},{"alias":"waline","alias_name":"@waline/client","file":"dist/comment.js","name":"comment","version":"2.13.0"}]}}</script>
@@ -35,7 +35,7 @@
 <link rel=stylesheet href=/css/noscript.css>
 </noscript>
 </head>
-<body itemscope itemtype=http://schema.org/WebPage class=use-motion>
+<body itemscope itemtype=http://schema.org/WebPage>
 <div class=headband></div>
 <main class=main>
 <header class=header itemscope itemtype=http://schema.org/WPHeader>
@@ -74,7 +74,7 @@
 </li>
 <li class="menu-item menu-item-archives">
 <a href=/archives/ class=hvr-icon-pulse rel=section><i class="fa fa-archive hvr-icon"></i>归档
-<span class=badge>8</span>
+<span class=badge>10</span>
 </a>
 </li>
 <li class="menu-item menu-item-search">
@@ -133,7 +133,7 @@
 <nav class=site-state>
 <div class="site-state-item site-state-posts">
 <a href=/archives/>
-<span class=site-state-item-count>8</span>
+<span class=site-state-item-count>10</span>
 <span class=site-state-item-name>日志</span>
 </a>
 </div>
@@ -198,15 +198,15 @@
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-font"></i>总字数：</div>
-<div class=item-count id=wordsCount data-count=11581></div>
+<div class=item-count id=wordsCount data-count=20354></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-mug-hot"></i>阅读约：</div>
-<div class=item-count id=readTimes data-times=27></div>
+<div class=item-count id=readTimes data-times=46></div>
 </div>
 <div class=siteinfo-item>
 <div class=item-name><i class="fa fa-clock-rotate-left"></i>最后更新于：</div>
-<div class=item-count id=last-push-date data-lastpushdate=2023-01-01T11:21:26+08:00></div>
+<div class=item-count id=last-push-date data-lastpushdate=2023-01-09T15:43:43+08:00></div>
 </div>
 </div>
 </div>
@@ -230,7 +230,7 @@
 <div class="main-inner index posts-expand">
 <div class=post-block>
 <article itemscope itemtype=http://schema.org/Article class=post-content lang>
-<link itemprop=mainEntityOfPage href=/post/20230101_01/>
+<link itemprop=mainEntityOfPage href=/post/linux_space_extend/>
 <span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
 <meta itemprop=image content="/imgs/hugo_next_avatar.png">
 <meta itemprop=name content="白夜">
@@ -240,12 +240,12 @@
 <meta itemprop=description content="雨水落进大海">
 </span>
 <span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
-<meta itemprop=name content="完美是一个结果">
-<meta itemprop=description content="完美是一个结果，如果一开始就奔着完美去，那可能永远无法开始。 尽早开始，慢慢迭代，慢慢打磨。如果最终结局没有那么好，也好过从未开始过。 在路上，">
+<meta itemprop=name content="Ubuntu 22 虚拟机扩容">
+<meta itemprop=description content="首先关闭虚拟机，然后给虚拟机磁盘扩容。 fdisk /dev/sda 进入之后按 d 选择删除 sda 现存的分区，从最大分区开始删，一直删到第一个。 然后新建分区：n, p, 一路回车 之">
 </span>
 <header class=post-header>
 <h2 class=post-title itemprop="name headline">
-<a href=/post/20230101_01/ itemprop=url class=post-title-link>完美是一个结果</a> </h2>
+<a href=/post/linux_space_extend/ itemprop=url class=post-title-link>Ubuntu 22 虚拟机扩容</a> </h2>
 <div class=post-meta-container>
 <div class=post-meta-items>
 <span class=post-meta-item>
@@ -253,7 +253,7 @@
 <i class="far fa-calendar"></i>
 </span>
 <span class=post-meta-item-text>发表于：</span>
-<time title="发表于：2023-01-01 11:21:26 +0800 +0800" itemprop="dateCreated datePublished" datetime="2023-01-01 11:21:26 +0800 +0800">2023-01-01</time>
+<time title="发表于：2023-01-09 15:43:43 +0800 +0800" itemprop="dateCreated datePublished" datetime="2023-01-09 15:43:43 +0800 +0800">2023-01-09</time>
 </span>
 <div class=post-meta-items>
 <span class=post-meta-item title=浏览>
@@ -263,7 +263,7 @@
 <span class=post-meta-item-text>
 浏览：
 </span>
-<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/20230101_01/>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/linux_space_extend/>
 <i class="fa fa-sync fa-spin"></i>
 </span>
 </span>
@@ -272,11 +272,123 @@
 </div>
 </header>
 <div class="post-body autonumber" itemprop=articleBody>
-完美是一个结果，如果一开始就奔着完美去，那可能永远无法开始。 尽早开始，慢慢迭代，慢慢打磨。如果最终结局没有那么好，也好过从未开始过。 在路上，
+首先关闭虚拟机，然后给虚拟机磁盘扩容。 fdisk /dev/sda 进入之后按 d 选择删除 sda 现存的分区，从最大分区开始删，一直删到第一个。 然后新建分区：n, p, 一路回车 之
 </div>
 <footer class=post-footer>
 <div class=post-button>
-<a class=btn href=/post/20230101_01/#more rel=contents>
+<a class=btn href=/post/linux_space_extend/#more rel=contents>
+阅读全文 &#187;
+</a>
+</div>
+<div class=post-eof></div>
+</footer>
+</article>
+</div>
+<div class=post-block>
+<article itemscope itemtype=http://schema.org/Article class=post-content lang>
+<link itemprop=mainEntityOfPage href=/post/20230101_03/>
+<span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=name content="白夜">
+</span>
+<span hidden itemprop=publisher itemscope itemtype=http://schema.org/Organization>
+<meta itemprop=name content="白夜">
+<meta itemprop=description content="雨水落进大海">
+</span>
+<span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
+<meta itemprop=name content="Paxos 共识算法（第二次尝试）">
+<meta itemprop=description content="共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只">
+</span>
+<header class=post-header>
+<h2 class=post-title itemprop="name headline">
+<a href=/post/20230101_03/ itemprop=url class=post-title-link>Paxos 共识算法（第二次尝试）</a> </h2>
+<div class=post-meta-container>
+<div class=post-meta-items>
+<span class=post-meta-item>
+<span class=post-meta-item-icon>
+<i class="far fa-calendar"></i>
+</span>
+<span class=post-meta-item-text>发表于：</span>
+<time title="发表于：2023-01-01 19:11:44 +0800 +0800" itemprop="dateCreated datePublished" datetime="2023-01-01 19:11:44 +0800 +0800">2023-01-01</time>
+</span>
+<div class=post-meta-items>
+<span class=post-meta-item title=浏览>
+<span class=post-meta-item-icon>
+<i class="far fa-eye"></i>
+</span>
+<span class=post-meta-item-text>
+浏览：
+</span>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/20230101_03/>
+<i class="fa fa-sync fa-spin"></i>
+</span>
+</span>
+</div>
+</div>
+</div>
+</header>
+<div class="post-body autonumber" itemprop=articleBody>
+共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只
+</div>
+<footer class=post-footer>
+<div class=post-button>
+<a class=btn href=/post/20230101_03/#more rel=contents>
+阅读全文 &#187;
+</a>
+</div>
+<div class=post-eof></div>
+</footer>
+</article>
+</div>
+<div class=post-block>
+<article itemscope itemtype=http://schema.org/Article class=post-content lang>
+<link itemprop=mainEntityOfPage href=/post/20230101_02/>
+<span hidden itemprop=author itemscope itemtype=http://schema.org/Person>
+<meta itemprop=image content="/imgs/hugo_next_avatar.png">
+<meta itemprop=name content="白夜">
+</span>
+<span hidden itemprop=publisher itemscope itemtype=http://schema.org/Organization>
+<meta itemprop=name content="白夜">
+<meta itemprop=description content="雨水落进大海">
+</span>
+<span hidden itemprop=post itemscope itemtype=http://schema.org/CreativeWork>
+<meta itemprop=name content="Paxos 共识算法（第一次尝试）">
+<meta itemprop=description content="共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只">
+</span>
+<header class=post-header>
+<h2 class=post-title itemprop="name headline">
+<a href=/post/20230101_02/ itemprop=url class=post-title-link>Paxos 共识算法（第一次尝试）</a> </h2>
+<div class=post-meta-container>
+<div class=post-meta-items>
+<span class=post-meta-item>
+<span class=post-meta-item-icon>
+<i class="far fa-calendar"></i>
+</span>
+<span class=post-meta-item-text>发表于：</span>
+<time title="发表于：2023-01-01 19:05:02 +0800 +0800" itemprop="dateCreated datePublished" datetime="2023-01-01 19:05:02 +0800 +0800">2023-01-01</time>
+</span>
+<div class=post-meta-items>
+<span class=post-meta-item title=浏览>
+<span class=post-meta-item-icon>
+<i class="far fa-eye"></i>
+</span>
+<span class=post-meta-item-text>
+浏览：
+</span>
+<span id=busuanzi_value_page_pv class=waline-pageview-count data-path=/post/20230101_02/>
+<i class="fa fa-sync fa-spin"></i>
+</span>
+</span>
+</div>
+</div>
+</div>
+</header>
+<div class="post-body autonumber" itemprop=articleBody>
+共识问题 对于一个变量来说，假设有一系列的进程都可以对它的值发出提议。共识（consensus）算法保证在这些提议（proposed）的值中只
+</div>
+<footer class=post-footer>
+<div class=post-button>
+<a class=btn href=/post/20230101_02/#more rel=contents>
 阅读全文 &#187;
 </a>
 </div>
@@ -700,7 +812,7 @@ Hugo 有时候会有点问题，看不见 post. 今天我想来聊聊 Java 开�
 </footer>
 <script type=text/javascript src=https://cdn.staticfile.org/animejs/3.2.1/anime.min.js defer></script>
 <script type=text/javascript src=https://cdn.staticfile.org/viewerjs/1.11.0/viewer.min.js defer></script>
-<script class=next-config data-name=main type=application/json>{"bookmark":{"color":"#222","enable":true,"save":"manual"},"busuanzi":{"pageview":true},"copybtn":true,"darkmode":true,"giscus":{"cfg":{"category":"Comments","categoryid":null,"emit":false,"inputposition":"top","mapping":"title","reactions":false,"repo":"username/repo-name","repoid":null,"theme":"preferred_color_scheme"},"js":"https://giscus.app/client.js"},"hostname":"/","i18n":{"ds_day":" 天前","ds_days":" 天 ","ds_hour":" 小时前","ds_hours":" 小时 ","ds_just":"刚刚","ds_min":" 分钟前","ds_mins":" 分钟","ds_month":" 个月前","ds_years":" 年 ","empty":"没有找到任何搜索结果：${query}","hits":"","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","placeholder":"搜索..."},"lang":"zh-CN","lazyload":false,"localSearch":{"enable":true,"path":"/searchindexes.xml","preload":false,"topnperarticle":-1,"trigger":"auto","unescape":false},"motion":{"async":true,"enable":true,"transition":{"collheader":"fadeInLeft","postblock":"fadeIn","postbody":"fadeInDown","postheader":"fadeInDown","sidebar":"fadeInUp"}},"root":"/","scheme":"Gemini","sidebar":{"display":"post","offset":12,"padding":18,"position":"left","width":256},"statis":{"enable":true,"plugin":"busuanzi"},"vendor":{"plugins":"qiniu","router":"https://cdn.staticfile.org"},"version":"4.4.1","waline":{"cfg":{"comment":true,"emoji":false,"imguploader":false,"pageview":true,"placeholder":"请文明发言哟 ヾ(≧▽≦*)o","reaction":true,"reactiontext":["点赞","踩一下","得意","不屑","尴尬","睡觉"],"reactiontitle":"你认为这篇文章怎么样？","requiredmeta":["nick","mail"],"serverurl":null,"sofa":"快来发表你的意见吧 (≧∀≦)ゞ","wordlimit":200},"css":{"alias":"waline","file":"dist/waline.css","name":"@waline/client","version":"2.13.0"},"js":{"alias":"waline","file":"dist/waline.js","name":"@waline/client","version":"2.13.0"}}}</script>
-<script type=text/javascript src=/js/main.min.7febcb46102ea06b82e271e7dbfc83e80e09db236fb807f26dc461d893d6d2e4.js defer></script>
+<script class=next-config data-name=main type=application/json>{"bookmark":{"color":"#222","enable":true,"save":"manual"},"busuanzi":{"pageview":true},"copybtn":true,"darkmode":true,"giscus":{"cfg":{"category":"Comments","categoryid":null,"emit":false,"inputposition":"top","mapping":"title","reactions":false,"repo":"username/repo-name","repoid":null,"theme":"preferred_color_scheme"},"js":"https://giscus.app/client.js"},"hostname":"/","i18n":{"ds_day":" 天前","ds_days":" 天 ","ds_hour":" 小时前","ds_hours":" 小时 ","ds_just":"刚刚","ds_min":" 分钟前","ds_mins":" 分钟","ds_month":" 个月前","ds_years":" 年 ","empty":"没有找到任何搜索结果：${query}","hits":"","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","placeholder":"搜索..."},"lang":"zh-CN","lazyload":false,"localSearch":{"enable":true,"path":"/searchindexes.xml","preload":false,"topnperarticle":-1,"trigger":"auto","unescape":false},"motion":{"async":true,"enable":false,"transition":{"collheader":"fadeInLeft","postblock":"fadeIn","postbody":"fadeInDown","postheader":"fadeInDown","sidebar":"fadeInUp"}},"root":"/","scheme":"Gemini","sidebar":{"display":"post","offset":12,"padding":18,"position":"left","width":256},"statis":{"enable":true,"plugin":"busuanzi"},"vendor":{"plugins":"qiniu","router":"https://cdn.staticfile.org"},"version":"4.4.1","waline":{"cfg":{"comment":true,"emoji":false,"imguploader":false,"pageview":true,"placeholder":"请文明发言哟 ヾ(≧▽≦*)o","reaction":true,"reactiontext":["点赞","踩一下","得意","不屑","尴尬","睡觉"],"reactiontitle":"你认为这篇文章怎么样？","requiredmeta":["nick","mail"],"serverurl":null,"sofa":"快来发表你的意见吧 (≧∀≦)ゞ","wordlimit":200},"css":{"alias":"waline","file":"dist/waline.css","name":"@waline/client","version":"2.13.0"},"js":{"alias":"waline","file":"dist/waline.js","name":"@waline/client","version":"2.13.0"}}}</script>
+<script type=text/javascript src=/js/main.min.44f22194cdbaf801583669f62e9338396a1209e5770f9210e5450ba9b6f498b2.js defer></script>
 </body>
 </html>
